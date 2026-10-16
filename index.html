@@ -66,7 +66,7 @@
       =============================================== -->
       <div id="view-home" class="page-view">
         
-        <!-- DES Pune University Hero Card (Exact match to student attachment) -->
+        <!-- 1. DES Pune University Hero Card -->
         <section class="despu-hero-card">
           <div class="despu-brand-header">
             <img src="des-logo.png" alt="DES Pune University - Deccan Education Society Since 1884" class="despu-logo-img">
@@ -83,23 +83,22 @@
           </div>
         </section>
 
-        <!-- Performative UI: <AsciiHero /> Component -->
-        <section class="ascii-hero-card">
-          <div class="ascii-hero-header">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-family: var(--font-mono); font-weight: 700; color: var(--text-primary);">&lt;AsciiHero /&gt;</span>
-              <span>Monospace Matrix Canvas</span>
-            </div>
-            <span style="color: #34c759; font-size: 11px; font-weight: 600;">● Live Interactive</span>
-          </div>
-          <canvas id="ascii-canvas" class="ascii-canvas"></canvas>
-          <div class="ascii-hero-overlay-text">
-            <h2>Interactive Algorithm Field</h2>
-            <p>Hover or move cursor over the field to deform the ASCII glyphs in real time</p>
-          </div>
+        <!-- 2. Exact README.md Content Section -->
+        <section class="readme-content-card">
+          <h2>DAA &amp; DSA Interactive Handbook</h2>
+          <p>Hi everyone, I'm Viraj - the creator of this little repo.<br>
+          I've published this as an interactive website thanks to the recommendation by my Professor - <strong>Pranalini Joshi</strong>, under her course - <strong>Design and Analysis of Algorithms</strong> - taught in the 5th Semester of my B.Tech degree in Computer Science and Engineering.</p>
+          
+          <p>I hope you enjoy this and find the implementations useful. I will try to keep handing off the repo via PR's to my juniors as I move to my other courses and relevant course-work, I'm sure they will add relevant and interesting updates to this little project.</p>
+          
+          <p>I hope this becomes a useful, and go to place for students taking up similar courses all over Pune to refer to and learn intuitively, visually and interactively from....</p>
+          
+          <p>If you want to suggest any changes, please open an <strong>Issue</strong> on Github, and then implement your suggesstion via a <strong>Pull Request</strong> in this repository : <a href="https://github.com/viraj-des/DAA-Codes-Reference" target="_blank" rel="noopener">https://github.com/viraj-des/DAA-Codes-Reference</a></p>
+          
+          <p style="font-weight: 700; margin-top: 24px; color: var(--text-primary);">- Best, Viraj Shah</p>
         </section>
 
-        <!-- Performative UI: StatCounter Banner -->
+        <!-- 3. Algorithms Available Stat Banner -->
         <section class="stat-counter-banner">
           <div class="stat-item">
             <div class="stat-value" id="stat-algos">9</div>
@@ -115,29 +114,30 @@
           </div>
         </section>
 
-        <!-- Exact README.md Content Section -->
-        <section class="readme-content-card">
-          <h2>DAA &amp; DSA Interactive Handbook</h2>
-          <p>Hi everyone, I'm Viraj - the creator of this little repo.<br>
-          I've published this as an interactive website thanks to the recommendation by my Professor - <strong>Pranalini Joshi</strong>, under her course - <strong>Design and Analysis of Algorithms</strong> - taught in the 5th Semester of my B.Tech degree in Computer Science and Engineering.</p>
-          
-          <p>I hope you enjoy this and find the implementations useful. I will try to keep handing off the repo via PR's to my juniors as I move to my other courses and relevant course-work, I'm sure they will add relevant and interesting updates to this little project.</p>
-          
-          <p>I hope this becomes a useful, and go to place for students taking up similar courses all over Pune to refer to and learn intuitively, visually and interactively from....</p>
-          
-          <p>If you want to suggest any changes, please open an <strong>Issue</strong> on Github, and then implement your suggesstion via a <strong>Pull Request</strong> in this repository : <a href="https://github.com/viraj-des/DAA-Codes-Reference" target="_blank" rel="noopener">https://github.com/viraj-des/DAA-Codes-Reference</a></p>
-          
-          <p style="font-weight: 700; margin-top: 24px; color: var(--text-primary);">- Best, Viraj Shah</p>
-        </section>
-
-        <!-- Directory / Algorithm Browser Grid -->
-        <section style="margin-top: 32px;">
+        <!-- 4. Explore All Algorithms Grid -->
+        <section style="margin-top: 24px; margin-bottom: 32px;">
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px;">
             <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">Explore All Algorithms</h2>
             <span style="font-size: 13px; color: var(--text-secondary);">Click any algorithm to jump to its interactive walkthrough</span>
           </div>
           <div class="home-algo-grid" id="home-algo-grid">
             <!-- Dynamically populated by app.js -->
+          </div>
+        </section>
+
+        <!-- 5. Interactive ASCII Field (<AsciiHero />) -->
+        <section class="ascii-hero-card">
+          <div class="ascii-hero-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-family: var(--font-mono); font-weight: 700; color: var(--text-primary);">&lt;AsciiHero /&gt;</span>
+              <span>Monospace Matrix Canvas</span>
+            </div>
+            <span style="color: #34c759; font-size: 11px; font-weight: 600;">● Live Interactive</span>
+          </div>
+          <canvas id="ascii-canvas" class="ascii-canvas"></canvas>
+          <div class="ascii-hero-overlay-text">
+            <h2>Interactive Algorithm Field</h2>
+            <p>Hover or move cursor over the field to deform the ASCII glyphs in real time</p>
           </div>
         </section>
 
