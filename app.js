@@ -1540,7 +1540,20 @@ class App {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const chars = " .'`\":;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+    // Algorithmic and mathematical character ramp
+    const chars = " ··:;~-+=^/{}[]10*λΩΘ∑√π%#&@$";
+    
+    // Subtle "VS" (Viraj Shah) watermark matrix bitmap (15 wide x 7 high)
+    const vsBitmap = [
+      "100000100111110",
+      "100000101000001",
+      "010001001000000",
+      "010001000111110",
+      "001010000000001",
+      "001010001000001",
+      "000100000111110"
+    ];
+
     let mouseX = -999;
     let mouseY = -999;
     let mouseActive = false;
@@ -1586,45 +1599,73 @@ class App {
       }
 
       const t = (now - startTime) * 0.002;
-      ctx.fillStyle = '#111115';
+      
+      // Light mode canvas background
+      ctx.fillStyle = '#f8f8fb';
       ctx.fillRect(0, 0, width, height);
 
-      ctx.font = '10px ui-monospace, "SF Mono", Menlo, monospace';
+      ctx.font = '10.5px ui-monospace, "SF Mono", Menlo, Monaco, monospace';
       ctx.textBaseline = 'top';
+
+      const vsStartC = Math.max(0, Math.floor((cols - 15) / 2));
+      const vsStartR = Math.max(0, Math.floor((rows - 7) / 2));
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const x = c * charW;
           const y = r * charH;
 
-          // Ambient wave formula
-          const wave1 = Math.sin(c * 0.09 + t * 1.5) * Math.cos(r * 0.14 - t * 0.9);
-          const wave2 = Math.sin((c + r) * 0.07 + t);
-          let intensity = (wave1 + wave2 + 2) / 4; // 0 to 1
+          // Ambient fluid wave formula
+          const wave1 = Math.sin(c * 0.08 + t * 1.5) * Math.cos(r * 0.16 - t * 1.1);
+          const wave2 = Math.sin((c * 1.1 + r * 0.8) * 0.06 + t * 0.9);
+          let intensity = (wave1 + wave2 + 2) / 4; // normalized 0 to 1
 
-          // Cursor ripple deformation
-          if (mouseActive) {
-            const dx = x - mouseX;
-            const dy = y - mouseY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 180) {
-              const ripple = Math.sin(dist * 0.08 - t * 6) * Math.exp(-dist * 0.02);
-              intensity = Math.max(0, Math.min(1, intensity + ripple * 0.8));
+          // Watermark Easter Egg: "VS" monogram
+          let isVS = false;
+          if (c >= vsStartC && c < vsStartC + 15 && r >= vsStartR && r < vsStartR + 7) {
+            isVS = vsBitmap[r - vsStartR][c - vsStartC] === '1';
+            if (isVS) {
+              intensity = Math.min(1, intensity + 0.26);
             }
           }
 
-          const charIdx = Math.floor(intensity * (chars.length - 1));
-          const char = chars[Math.max(0, Math.min(chars.length - 1, charIdx))];
+          // Cursor ripple wave deformation
+          let cursorDist = 999;
+          if (mouseActive) {
+            const dx = x - mouseX;
+            const dy = y - mouseY;
+            cursorDist = Math.sqrt(dx * dx + dy * dy);
+            if (cursorDist < 190) {
+              const ripple = Math.sin(cursorDist * 0.08 - t * 6) * Math.exp(-cursorDist * 0.018);
+              intensity = Math.max(0, Math.min(1, intensity + ripple * 0.85));
+            }
+          }
 
-          // Subtly colorize active ripples and matrix
-          if (intensity > 0.75) {
-            ctx.fillStyle = '#34c759'; // vibrant terminal green on peaks
-          } else if (intensity > 0.5) {
-            ctx.fillStyle = '#5ac8fa'; // cyan highlights
-          } else if (intensity > 0.25) {
-            ctx.fillStyle = '#8e8e93'; // soft gray
+          // Pick character
+          let char = '·';
+          if (isVS && (cursorDist < 160 || intensity > 0.52)) {
+            char = (c < vsStartC + 7) ? 'V' : 'S';
+          } else if ((c * 7 + r * 13) % 29 === 0 && intensity > 0.3) {
+            const tokens = ['V', 'S', 'λ', 'Ω', 'Θ', '1', '0', 'π', '∑', '√'];
+            char = tokens[(c + r) % tokens.length];
           } else {
-            ctx.fillStyle = '#3a3a3c'; // faint background glyphs
+            const charIdx = Math.floor(intensity * (chars.length - 1));
+            char = chars[Math.max(0, Math.min(chars.length - 1, charIdx))];
+          }
+
+          // Apple Light Theme Color System
+          if (isVS && (cursorDist < 160 || intensity > 0.52)) {
+            ctx.fillStyle = '#0071e3'; // Apple Blue for VS monogram
+          } else if (intensity > 0.72) {
+            ctx.fillStyle = '#1d1d1f'; // Crisp deep text
+          } else if (intensity > 0.52) {
+            ctx.fillStyle = '#0071e3'; // Electric Apple Blue ripple peaks
+          } else if (intensity > 0.35) {
+            ctx.fillStyle = '#6e6e73'; // Medium neutral
+          } else if (intensity > 0.2) {
+            ctx.fillStyle = '#8e8e93'; // Soft gray
+          } else {
+            ctx.fillStyle = '#d2d2d7'; // Faint ambient matrix
           }
 
           ctx.fillText(char, x, y);
