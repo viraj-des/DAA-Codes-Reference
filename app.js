@@ -1,6 +1,3 @@
-// DAA & DSA Interactive Learning Handbook
-// Connected to github.com/viraj-des/DAA-Codes-Reference
-
 const REPO_URL = "https://github.com/viraj-des/DAA-Codes-Reference";
 const REPO_CODES = {
   "Assignment 10 - Sudoku/Main.java": "\nimport java.util.Scanner;\n\nclass Main {\n    static int[][] board = new int[9][9];\n\n    static boolean isSafe(int row, int col, int num) {\n        for (int i = 0; i < 9; i++) {\n            if (board[row][i] == num ||\n                board[i][col] == num) {\n                return false;\n            }\n        }\n\n        int startRow = row - row % 3;\n        int startCol = col - col % 3;\n\n        for (int i = startRow; i < startRow + 3; i++) {\n            for (int j = startCol; j < startCol + 3; j++) {\n                if (board[i][j] == num) {\n                    return false;\n                }\n            }\n        }\n\n        return true;\n    }\n\n    static boolean solveSudoku() {\n        for (int row = 0; row < 9; row++) {\n            for (int col = 0; col < 9; col++) {\n                if (board[row][col] == 0) {\n                    for (int num = 1; num <= 9; num++) {\n                        if (isSafe(row, col, num)) {\n                            board[row][col] = num;\n\n                            if (solveSudoku()) {\n                                return true;\n                            }\n\n                            board[row][col] = 0;\n                        }\n                    }\n\n                    return false;\n                }\n            }\n        }\n\n        return true;\n    }\n\n    static boolean validBoard() {\n        for (int row = 0; row < 9; row++) {\n            for (int col = 0; col < 9; col++) {\n                int num = board[row][col];\n\n                if (num != 0) {\n                    board[row][col] = 0;\n                    boolean safe = isSafe(row, col, num);\n                    board[row][col] = num;\n\n                    if (!safe) {\n                        return false;\n                    }\n                }\n            }\n        }\n\n        return true;\n    }\n\n    static void printBoard() {\n        for (int i = 0; i < 9; i++) {\n            for (int j = 0; j < 9; j++) {\n                System.out.print(board[i][j] + \" \");\n            }\n            System.out.println();\n        }\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n\n        System.out.println(\"Enter Sudoku puzzle (0 for empty cells):\");\n\n        for (int i = 0; i < 9; i++) {\n            for (int j = 0; j < 9; j++) {\n                board[i][j] = sc.nextInt();\n\n                if (board[i][j] < 0 || board[i][j] > 9) {\n                    System.out.println(\"Invalid input.\");\n                    sc.close();\n                    return;\n                }\n            }\n        }\n\n        if (!validBoard()) {\n            System.out.println(\"Invalid Sudoku puzzle.\");\n        } else if (solveSudoku()) {\n            System.out.println(\"Solved Sudoku:\");\n            printBoard();\n        } else {\n            System.out.println(\"No solution exists.\");\n        }\n\n        sc.close();\n    }\n}\n",
@@ -14,7 +11,6 @@ const REPO_CODES = {
   "Quick sort/Main.java": "import java.util.Scanner;\n\npublic class Main {\n    static void quickSort(int[] arr, int low, int high) {\n        if (low < high) {\n            int p = partition(arr, low, high);\n            quickSort(arr, low, p - 1);\n            quickSort(arr, p + 1, high);\n        }\n    }\n\n    static int partition(int[] arr, int low, int high) {\n        int pivot = arr[high];\n        int i = low - 1;\n\n        for (int j = low; j < high; j++) {\n            if (arr[j] < pivot) {\n                i++;\n\n                int temp = arr[i];\n                arr[i] = arr[j];\n                arr[j] = temp;\n            }\n        }\n\n        int temp = arr[i + 1];\n        arr[i + 1] = arr[high];\n        arr[high] = temp;\n\n        return i + 1;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n\n        System.out.println(\"Quick Sort Java Implementation\");\n\n        System.out.println(\"Enter the Number of Elements: \");\n        int n = sc.nextInt();\n\n        int[] arr = new int[n];\n\n        System.out.println(\"Enter the Elements:\");\n        for (int i = 0; i < n; i++) {\n            arr[i] = sc.nextInt();\n        }\n\n        quickSort(arr, 0, n - 1);\n\n        System.out.println(\"Sorted Array:\");\n        for (int i = 0; i < n; i++) {\n            System.out.print(arr[i] + \" \");\n        }\n    }\n}"
 };
 
-// Helper to parse student array input gracefully (accepts commas, spaces, or tabs)
 function parseNumbers(str) {
   return str
     .replace(/,/g, ' ')
@@ -24,7 +20,6 @@ function parseNumbers(str) {
     .filter(x => !isNaN(x));
 }
 
-// Categories & Algorithms Catalog
 const CATEGORIES = [
   {
     name: "Divide & Conquer",
@@ -1449,7 +1444,6 @@ const ALGORITHMS = [
   }
 ];
 
-// App Controller
 class App {
   constructor() {
     this.currentAlgo = ALGORITHMS[0];
@@ -1497,7 +1491,10 @@ class App {
       btnCopyCode: document.getElementById('btn-copy-code'),
       codeFileLabel: document.getElementById('code-file-label'),
       codeTabName: document.getElementById('code-tab-name'),
-      sourceCodeDisplay: document.getElementById('source-code-display')
+      sourceCodeDisplay: document.getElementById('source-code-display'),
+      mobileMenuToggle: document.getElementById('mobile-menu-toggle'),
+      sidebarBackdrop: document.getElementById('sidebar-backdrop'),
+      sidebar: document.querySelector('.sidebar')
     };
 
     this.init();
@@ -1509,6 +1506,23 @@ class App {
     this.bindEvents();
     this.initAsciiHero();
     this.showHome();
+  }
+
+  toggleMobileSidebar() {
+    if (!this.dom.sidebar) return;
+    const isOpen = this.dom.sidebar.classList.toggle('open');
+    if (this.dom.sidebarBackdrop) {
+      this.dom.sidebarBackdrop.classList.toggle('active', isOpen);
+    }
+  }
+
+  closeMobileSidebar() {
+    if (this.dom.sidebar) {
+      this.dom.sidebar.classList.remove('open');
+    }
+    if (this.dom.sidebarBackdrop) {
+      this.dom.sidebarBackdrop.classList.remove('active');
+    }
   }
 
   renderHomeGrid() {
@@ -1540,10 +1554,8 @@ class App {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Algorithmic and mathematical character ramp
     const chars = " ··:;~-+=^/{}[]10*λΩΘ∑√π%#&@$";
     
-    // Subtle "VS" (Viraj Shah) watermark matrix bitmap (15 wide x 7 high)
     const vsBitmap = [
       "100000100111110",
       "100000101000001",
@@ -1590,6 +1602,21 @@ class App {
       mouseY = -999;
     });
 
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.touches[0].clientX - rect.left;
+        mouseY = e.touches[0].clientY - rect.top;
+        mouseActive = true;
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', () => {
+      mouseActive = false;
+      mouseX = -999;
+      mouseY = -999;
+    }, { passive: true });
+
     let startTime = performance.now();
 
     const renderAscii = (now) => {
@@ -1600,7 +1627,6 @@ class App {
 
       const t = (now - startTime) * 0.002;
       
-      // Light mode canvas background
       ctx.fillStyle = '#f8f8fb';
       ctx.fillRect(0, 0, width, height);
 
@@ -1615,12 +1641,10 @@ class App {
           const x = c * charW;
           const y = r * charH;
 
-          // Ambient fluid wave formula
           const wave1 = Math.sin(c * 0.08 + t * 1.5) * Math.cos(r * 0.16 - t * 1.1);
           const wave2 = Math.sin((c * 1.1 + r * 0.8) * 0.06 + t * 0.9);
-          let intensity = (wave1 + wave2 + 2) / 4; // normalized 0 to 1
+          let intensity = (wave1 + wave2 + 2) / 4;
 
-          // Watermark Easter Egg: "VS" monogram
           let isVS = false;
           if (c >= vsStartC && c < vsStartC + 15 && r >= vsStartR && r < vsStartR + 7) {
             isVS = vsBitmap[r - vsStartR][c - vsStartC] === '1';
@@ -1629,7 +1653,6 @@ class App {
             }
           }
 
-          // Cursor ripple wave deformation
           let cursorDist = 999;
           if (mouseActive) {
             const dx = x - mouseX;
@@ -1641,7 +1664,6 @@ class App {
             }
           }
 
-          // Pick character
           let char = '·';
           if (isVS && (cursorDist < 160 || intensity > 0.52)) {
             char = (c < vsStartC + 7) ? 'V' : 'S';
@@ -1653,19 +1675,18 @@ class App {
             char = chars[Math.max(0, Math.min(chars.length - 1, charIdx))];
           }
 
-          // Apple Light Theme Color System
           if (isVS && (cursorDist < 160 || intensity > 0.52)) {
-            ctx.fillStyle = '#0071e3'; // Apple Blue for VS monogram
+            ctx.fillStyle = '#0071e3';
           } else if (intensity > 0.72) {
-            ctx.fillStyle = '#1d1d1f'; // Crisp deep text
+            ctx.fillStyle = '#1d1d1f';
           } else if (intensity > 0.52) {
-            ctx.fillStyle = '#0071e3'; // Electric Apple Blue ripple peaks
+            ctx.fillStyle = '#0071e3';
           } else if (intensity > 0.35) {
-            ctx.fillStyle = '#6e6e73'; // Medium neutral
+            ctx.fillStyle = '#6e6e73';
           } else if (intensity > 0.2) {
-            ctx.fillStyle = '#8e8e93'; // Soft gray
+            ctx.fillStyle = '#8e8e93';
           } else {
-            ctx.fillStyle = '#d2d2d7'; // Faint ambient matrix
+            ctx.fillStyle = '#d2d2d7';
           }
 
           ctx.fillText(char, x, y);
@@ -1687,12 +1708,12 @@ class App {
 
   showHome() {
     this.pause();
+    this.closeMobileSidebar();
     this.currentView = 'home';
     if (this.dom.viewHome) this.dom.viewHome.style.display = 'block';
     if (this.dom.viewAlgorithm) this.dom.viewAlgorithm.style.display = 'none';
     if (this.dom.sidebarHomeBtn) this.dom.sidebarHomeBtn.classList.add('active');
 
-    // Deselect algorithm items in sidebar
     if (this.dom.sidebarCategories) {
       this.dom.sidebarCategories.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
     }
@@ -1735,6 +1756,12 @@ class App {
   }
 
   bindEvents() {
+    if (this.dom.mobileMenuToggle) {
+      this.dom.mobileMenuToggle.onclick = () => this.toggleMobileSidebar();
+    }
+    if (this.dom.sidebarBackdrop) {
+      this.dom.sidebarBackdrop.onclick = () => this.closeMobileSidebar();
+    }
     if (this.dom.sidebarHomeBtn) {
       this.dom.sidebarHomeBtn.onclick = () => this.showHome();
     }
@@ -1839,6 +1866,7 @@ class App {
 
   loadAlgo(id) {
     this.pause();
+    this.closeMobileSidebar();
     this.currentView = 'algo';
     if (this.dom.viewHome) this.dom.viewHome.style.display = 'none';
     if (this.dom.viewAlgorithm) this.dom.viewAlgorithm.style.display = 'block';
@@ -1848,13 +1876,11 @@ class App {
     this.params = { ...this.currentAlgo.defaultParams };
     this.renderSidebar(this.dom.searchBox.value);
 
-    // Header
     this.dom.breadcrumbText.textContent = `Algorithms > ${this.currentAlgo.category} > ${this.currentAlgo.name}`;
     this.dom.algoTitle.textContent = this.currentAlgo.name;
     this.dom.categoryPill.textContent = this.currentAlgo.category;
     this.dom.complexityPill.textContent = this.currentAlgo.complexity.avg;
 
-    // Overview & Theory
     this.dom.theoryCallout.innerHTML = `<b>Core Principle:</b> ${this.currentAlgo.concept}`;
     this.dom.theoryDesc.textContent = this.currentAlgo.description;
     this.dom.theorySteps.innerHTML = this.currentAlgo.steps.map(s => `<li>${s}</li>`).join('');
@@ -1864,13 +1890,11 @@ class App {
     this.dom.valWorst.textContent = this.currentAlgo.complexity.worst;
     this.dom.valSpace.textContent = this.currentAlgo.complexity.space;
 
-    // Controls
     this.currentAlgo.renderControls(this.dom.algoControls, this.params, (newParams) => {
       this.params = newParams;
       this.recompute();
     });
 
-    // Code
     const path = this.currentAlgo.githubFile;
     const rawCode = REPO_CODES[path] || "// Source code not found.";
     this.dom.codeFileLabel.textContent = `File: ${path} (from viraj-des/DAA-Codes-Reference)`;
@@ -1899,7 +1923,6 @@ class App {
   }
 }
 
-// Boot on DOM Ready
 window.addEventListener('DOMContentLoaded', () => {
   window.app = new App();
 });
