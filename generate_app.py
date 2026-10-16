@@ -3,7 +3,7 @@ import json
 with open('repo_codes.json') as f:
     codes = json.load(f)
 
-template = r'''// DAA Lab Windows 98 Suite
+template = r'''// DAA & DSA Interactive Learning Handbook
 // Connected to github.com/viraj-des/DAA-Lab-TY
 
 const REPO_URL = "https://github.com/viraj-des/DAA-Lab-TY";
@@ -19,41 +19,68 @@ function parseNumbers(str) {
     .filter(x => !isNaN(x));
 }
 
-// Algorithm Definitions
+// Categories & Algorithms Catalog
+const CATEGORIES = [
+  {
+    name: "Divide & Conquer",
+    items: ["binary_search", "merge_sort", "quick_sort"]
+  },
+  {
+    name: "Greedy Algorithms",
+    items: ["job_sequencing", "prims_mst", "dijkstra"]
+  },
+  {
+    name: "Dynamic Programming",
+    items: ["floyd_warshall"]
+  },
+  {
+    name: "Backtracking",
+    items: ["sudoku", "n_queens"]
+  }
+];
+
 const ALGORITHMS = [
   {
     id: "binary_search",
     name: "Binary Search",
-    assignment: "Lab 1",
+    category: "Divide & Conquer",
     githubFile: "Binary search/Main.java",
     githubUrl: `${REPO_URL}/blob/main/Binary%20search/Main.java`,
-    concept: "Looks at the middle box each time: if the target is smaller, throws away the right half; if larger, throws away the left half (O(log n)).",
-    complexity: { best: "O(1) [Found in middle on 1st try]", avg: "O(log n)", worst: "O(log n)", space: "O(1)" },
+    concept: "Repeatedly halves the candidate search window by comparing the target key with the middle element.",
+    description: "Binary Search is the gold standard search algorithm for sorted datasets. Instead of scanning one element at a time (linear search in O(n)), it eliminates half of the remaining elements in every single comparison step, yielding lightning fast O(log n) time.",
+    steps: [
+      "Verify the collection is already sorted in ascending order.",
+      "Calculate the midpoint index: mid = Math.floor((low + high) / 2).",
+      "Compare target with array[mid]: if equal, target is found!",
+      "If target < array[mid], discard the right half by setting high = mid - 1.",
+      "If target > array[mid], discard the left half by setting low = mid + 1.",
+      "Repeat until target is found or low > high (element does not exist)."
+    ],
+    complexity: { best: "O(1)", avg: "O(log n)", worst: "O(log n)", space: "O(1)" },
     defaultParams: {
       arr: [4, 9, 15, 23, 38, 45, 56, 67, 72, 89, 94],
       key: 45
     },
     renderControls(container, params, onChange) {
       container.innerHTML = `
-        <div style="margin-bottom: 6px;">
-          <label style="font-weight: bold;">Enter Numbers (separated by commas or spaces):</label>
-          <input type="text" id="bs-arr-input" class="win-input" style="width: 100%; margin-top: 3px;" value="${params.arr.join(', ')}">
+        <div class="control-group">
+          <label class="control-label">Array Elements (comma or space separated):</label>
+          <input type="text" id="bs-arr-input" class="text-input" value="${params.arr.join(', ')}">
         </div>
-        <div class="preset-chips">
-          <button class="preset-chip" id="bs-pre-rand">🎲 Random (10)</button>
-          <button class="preset-chip" id="bs-pre-simple">🔢 10 to 90</button>
-          <button class="preset-chip" id="bs-pre-sort">📈 Auto-Sort List</button>
+        <div class="btn-chips">
+          <button class="btn-chip" id="bs-pre-rand">🎲 Random (10)</button>
+          <button class="btn-chip" id="bs-pre-simple">🔢 10 to 90</button>
+          <button class="btn-chip" id="bs-pre-sort">📈 Auto-Sort List</button>
         </div>
-        <div style="margin-top: 8px;">
-          <div style="font-weight: bold; margin-bottom: 3px;">Click a number to search for it:</div>
-          <div style="display: flex; flex-wrap: wrap; gap: 4px;" id="bs-key-pills">
-            ${params.arr.map(num => `<span class="clickable-num-pill ${num === params.key ? 'active' : ''}" data-val="${num}">${num}</span>`).join('')}
-            <span class="clickable-num-pill" data-val="999" title="Test a missing number" style="background: #ffe0e0; border-color: #880000; color: #880000;">Missing (999)</span>
+        <div style="margin-top: 14px;">
+          <label class="control-label">Select Target Key (click a chip or type below):</label>
+          <div class="btn-chips" id="bs-key-pills">
+            ${params.arr.map(num => `<button class="btn-chip ${num === params.key ? 'active' : ''}" data-val="${num}">${num}</button>`).join('')}
+            <button class="btn-chip" data-val="999" style="color: #ff3b30; border-color: #ffc7c4;">Missing (999)</button>
           </div>
         </div>
-        <div class="control-row" style="margin-top: 8px;">
-          <label><b>Or type any target key:</b></label>
-          <input type="number" id="bs-key-input" class="win-input" style="width: 70px;" value="${params.key}">
+        <div class="control-group" style="margin-top: 10px; max-width: 140px;">
+          <input type="number" id="bs-key-input" class="text-input" value="${params.key}">
         </div>
       `;
 
@@ -69,7 +96,7 @@ const ALGORITHMS = [
         onChange({ arr: raw, key: k });
       };
 
-      container.querySelectorAll('.clickable-num-pill').forEach(pill => {
+      container.querySelectorAll('[data-val]').forEach(pill => {
         pill.onclick = () => {
           keyInput.value = pill.dataset.val;
           apply();
@@ -104,7 +131,7 @@ const ALGORITHMS = [
 
       steps.push({
         low, high, mid: -1, key, found: false,
-        log: `Step 1 of Search: We are searching for ${key} in a sorted list of ${arr.length} numbers. Start range is [Index 0] to [Index ${arr.length - 1}].`
+        log: `Step 1: Start search interval [0..${arr.length - 1}]. Target key is ${key}.`
       });
 
       while (low <= high) {
@@ -115,19 +142,19 @@ const ALGORITHMS = [
         if (val === key) {
           steps.push({
             low, high, mid, key, found: true,
-            log: `Step ${stepNum}: Middle box [Index ${mid}] contains ${val}. Exact match found! Search is complete!`
+            log: `Step ${stepNum}: Middle element at index ${mid} is ${val}. Target found! Search complete in ${stepNum} operations.`
           });
           return steps;
         } else if (key < val) {
           steps.push({
             low, high, mid, key, found: false,
-            log: `Step ${stepNum}: Look at middle box [Index ${mid}] which has ${val}. Since target ${key} is smaller, throw away the right side and search left!`
+            log: `Step ${stepNum}: Middle element is ${val}. Target ${key} < ${val}, so discard right half. High updated to index ${mid - 1}.`
           });
           high = mid - 1;
         } else {
           steps.push({
             low, high, mid, key, found: false,
-            log: `Step ${stepNum}: Look at middle box [Index ${mid}] which has ${val}. Since target ${key} is larger, throw away the left side and search right!`
+            log: `Step ${stepNum}: Middle element is ${val}. Target ${key} > ${val}, so discard left half. Low updated to index ${mid + 1}.`
           });
           low = mid + 1;
         }
@@ -135,7 +162,7 @@ const ALGORITHMS = [
 
       steps.push({
         low, high, mid: -1, key, found: false, notFound: true,
-        log: `Search Finished: We ran out of boxes to check (low passed high). Number ${key} is NOT in this array!`
+        log: `Search Complete: Candidate range exhausted (low > high). Key ${key} does not exist in array.`
       });
       return steps;
     },
@@ -163,7 +190,7 @@ const ALGORITHMS = [
             ${isMid ? '<span class="bs-pointer mid">MID</span>' : ''}
             ${isHigh && (!isLow || step.low !== step.high) ? '<span class="bs-pointer high">HIGH</span>' : ''}
             <div class="${cls}">${val}</div>
-            <div class="bs-idx">Box ${idx}</div>
+            <div class="bs-idx">[${idx}]</div>
           </div>
         `;
       });
@@ -175,25 +202,33 @@ const ALGORITHMS = [
   {
     id: "merge_sort",
     name: "Merge Sort",
-    assignment: "Lab 2",
+    category: "Divide & Conquer",
     githubFile: "Lab2-MergeSort/MergeSort.java",
     githubUrl: `${REPO_URL}/blob/main/Lab2-MergeSort/MergeSort.java`,
-    concept: "Splits the array into smaller halves until each is just 1 number, then merges them back together in perfect sorted order (O(n log n)).",
-    complexity: { best: "O(n log n)", avg: "O(n log n)", worst: "O(n log n)", space: "O(n) [Requires extra merge memory]" },
+    concept: "Recursively divides array into singletons, then merges sorted subarrays pairwise in linear time.",
+    description: "Merge Sort is a stable, comparison-based divide-and-conquer algorithm. It guarantees O(n log n) running time even in the worst case by breaking the problem down to trivial size-1 arrays and then executing efficient two-pointer merges.",
+    steps: [
+      "Divide: Compute midpoint m = (l + r) / 2 and recursively sort left half [l..m] and right half [m+1..r].",
+      "Base Case: Recursion halts when a subarray has 1 or 0 elements (which are trivially sorted).",
+      "Merge: Create temporary buffers for left and right subarrays.",
+      "Conquer: Compare front elements of both buffers, copy the smaller into the main array, and advance pointers.",
+      "Copy any remaining elements from either buffer to finish the merge step."
+    ],
+    complexity: { best: "O(n log n)", avg: "O(n log n)", worst: "O(n log n)", space: "O(n)" },
     defaultParams: {
       arr: [38, 27, 43, 3, 9, 82, 10, 19]
     },
     renderControls(container, params, onChange) {
       container.innerHTML = `
-        <div style="margin-bottom: 6px;">
-          <label style="font-weight: bold;">Enter Array (separated by commas or spaces):</label>
-          <input type="text" id="ms-arr-input" class="win-input" style="width: 100%; margin-top: 3px;" value="${params.arr.join(', ')}">
+        <div class="control-group">
+          <label class="control-label">Array Elements (comma or space separated):</label>
+          <input type="text" id="ms-arr-input" class="text-input" value="${params.arr.join(', ')}">
         </div>
-        <div class="preset-chips">
-          <button class="preset-chip" id="ms-pre-rand">🎲 Random (8)</button>
-          <button class="preset-chip" id="ms-pre-rev">📉 Reversed (Worst)</button>
-          <button class="preset-chip" id="ms-pre-sorted">📈 Already Sorted</button>
-          <button class="preset-chip" id="ms-pre-small">🧼 Simple (5)</button>
+        <div class="btn-chips">
+          <button class="btn-chip" id="ms-pre-rand">🎲 Random (8)</button>
+          <button class="btn-chip" id="ms-pre-rev">📉 Reversed Order</button>
+          <button class="btn-chip" id="ms-pre-sorted">📈 Already Sorted</button>
+          <button class="btn-chip" id="ms-pre-small">🧼 Simple (5)</button>
         </div>
       `;
       const input = container.querySelector('#ms-arr-input');
@@ -227,7 +262,7 @@ const ALGORITHMS = [
       const steps = [];
       steps.push({
         arr: [...arr], left: -1, right: -1, mid: -1,
-        log: `Step 1: Start with ${arr.length} numbers: [${arr.join(', ')}]. We will break this into smaller pieces, sort each piece, and merge them back.`
+        log: `Step 1: Input array has ${arr.length} elements: [${arr.join(', ')}].`
       });
 
       function mergeSort(a, l, r) {
@@ -235,7 +270,7 @@ const ALGORITHMS = [
           const m = Math.floor((l + r) / 2);
           steps.push({
             arr: [...a], left: l, right: r, mid: m, phase: "divide",
-            log: `Step ${steps.length + 1} (Split): Cut section [${l}..${r}] in half at middle. Left piece is [${l}..${m}], Right piece is [${m+1}..${r}].`
+            log: `Divide: Subarray [${l}..${r}] split at midpoint ${m} -> [${l}..${m}] and [${m+1}..${r}].`
           });
           mergeSort(a, l, m);
           mergeSort(a, m + 1, r);
@@ -255,7 +290,7 @@ const ALGORITHMS = [
         while (i < n1 && j < n2) {
           steps.push({
             arr: [...a], left: l, right: r, mid: m, comparing: [l + i, m + 1 + j],
-            log: `Step ${steps.length + 1} (Compare): Look at Left (${L[i]}) vs Right (${R[j]}). Take the smaller one (${Math.min(L[i], R[j])}) and put it into place!`
+            log: `Compare: L[${i}]=${L[i]} with R[${j}]=${R[j]}. Placing smaller value ${Math.min(L[i], R[j])} at index ${k}.`
           });
           if (L[i] <= R[j]) {
             a[k] = L[i];
@@ -271,14 +306,14 @@ const ALGORITHMS = [
 
         steps.push({
           arr: [...a], left: l, right: r, mid: m, merged: true,
-          log: `Step ${steps.length + 1} (Merged): Section [${l}..${r}] is now merged into sorted order: [${a.slice(l, r + 1).join(', ')}].`
+          log: `Merge complete: Subarray [${l}..${r}] is now sorted: [${a.slice(l, r + 1).join(', ')}].`
         });
       }
 
       mergeSort(arr, 0, arr.length - 1);
       steps.push({
         arr: [...arr], complete: true,
-        log: `Done! All sections are merged. Entire array is now completely sorted: [${arr.join(', ')}].`
+        log: `Sorting Complete: Entire array is sorted in-place: [${arr.join(', ')}].`
       });
       return steps;
     },
@@ -301,7 +336,7 @@ const ALGORITHMS = [
         html += `
           <div class="sort-bar-col">
             <div class="${barClass}" style="height: ${heightPct}%;">${val}</div>
-            <span style="font-size: 10px; margin-top: 4px; color: #333; font-weight: bold;">[${idx}]</span>
+            <span style="font-size: 11px; margin-top: 6px; color: var(--text-secondary); font-weight: 600;">[${idx}]</span>
           </div>
         `;
       });
@@ -313,24 +348,32 @@ const ALGORITHMS = [
   {
     id: "quick_sort",
     name: "Quick Sort",
-    assignment: "Lab 3",
+    category: "Divide & Conquer",
     githubFile: "Quick sort/Main.java",
     githubUrl: `${REPO_URL}/blob/main/Quick%20sort/Main.java`,
-    concept: "Picks a benchmark number (pivot), moves all smaller numbers to its left and larger numbers to its right, then repeats on both sides (O(n log n) avg).",
-    complexity: { best: "O(n log n)", avg: "O(n log n)", worst: "O(n^2) [When already sorted]", space: "O(log n)" },
+    concept: "Partitions elements around a pivot so smaller elements precede and greater follow, then recurses.",
+    description: "Quick Sort is widely considered the fastest practical sorting algorithm in practice. It works in-place by selecting a pivot, partitioning all smaller elements to the left, and placing the pivot directly into its definitive final position.",
+    steps: [
+      "Select a pivot element (the student Java implementation selects the last element).",
+      "Initialize pointer i = low - 1. Iterate j from low to high - 1.",
+      "If array[j] < pivot, increment i and swap array[i] with array[j].",
+      "Place pivot in correct position by swapping array[i + 1] with array[high].",
+      "Recursively apply quick sort to left subarray [low..i] and right subarray [i+2..high]."
+    ],
+    complexity: { best: "O(n log n)", avg: "O(n log n)", worst: "O(n^2)", space: "O(log n)" },
     defaultParams: {
       arr: [48, 12, 75, 33, 90, 24, 60, 15]
     },
     renderControls(container, params, onChange) {
       container.innerHTML = `
-        <div style="margin-bottom: 6px;">
-          <label style="font-weight: bold;">Enter Array (separated by commas or spaces):</label>
-          <input type="text" id="qs-arr-input" class="win-input" style="width: 100%; margin-top: 3px;" value="${params.arr.join(', ')}">
+        <div class="control-group">
+          <label class="control-label">Array Elements (comma or space separated):</label>
+          <input type="text" id="qs-arr-input" class="text-input" value="${params.arr.join(', ')}">
         </div>
-        <div class="preset-chips">
-          <button class="preset-chip" id="qs-pre-rand">🎲 Random (8)</button>
-          <button class="preset-chip" id="qs-pre-sorted">⚠️ Sorted (Shows Worst Case)</button>
-          <button class="preset-chip" id="qs-pre-small">🧼 Simple (5)</button>
+        <div class="btn-chips">
+          <button class="btn-chip" id="qs-pre-rand">🎲 Random (8)</button>
+          <button class="btn-chip" id="qs-pre-sorted">⚠️ Sorted (Demonstrates Worst Case)</button>
+          <button class="btn-chip" id="qs-pre-small">🧼 Simple (5)</button>
         </div>
       `;
       const input = container.querySelector('#qs-arr-input');
@@ -363,7 +406,7 @@ const ALGORITHMS = [
       steps.push({
         arr: [...arr], low: 0, high: arr.length - 1, pivotIdx: -1, i: -1, j: -1,
         finalized: Array.from(finalized),
-        log: `Step 1: Start Quick Sort on [${arr.join(', ')}]. Following your Java lab code, the last element of each section is chosen as the Pivot.`
+        log: `Step 1: Starting Quick Sort on [${arr.join(', ')}]. Last element is chosen as pivot.`
       });
 
       function quickSort(a, low, high) {
@@ -382,7 +425,7 @@ const ALGORITHMS = [
         steps.push({
           arr: [...a], low, high, pivotIdx: high, i, j: low,
           finalized: Array.from(finalized),
-          log: `Step ${steps.length + 1}: In section [${low}..${high}], the Pivot is ${pivot} (in Red). Scan through elements to compare against ${pivot}.`
+          log: `Partition section [${low}..${high}]: Pivot is ${pivot} (highlighted in red). Scanning elements against pivot.`
         });
 
         for (let j = low; j < high; j++) {
@@ -392,13 +435,13 @@ const ALGORITHMS = [
             steps.push({
               arr: [...a], low, high, pivotIdx: high, i, j, swap: [i, j],
               finalized: Array.from(finalized),
-              log: `Step ${steps.length + 1}: Box [${j}] has ${a[i]} which is smaller than pivot ${pivot}. Swap it to the left side (Box [${i}])!`
+              log: `Element ${a[i]} < pivot ${pivot}: increment index i to ${i}, swap values at [${i}] and [${j}].`
             });
           } else {
             steps.push({
               arr: [...a], low, high, pivotIdx: high, i, j,
               finalized: Array.from(finalized),
-              log: `Step ${steps.length + 1}: Box [${j}] has ${a[j]} which is bigger or equal to pivot ${pivot}. Leave it where it is and keep scanning.`
+              log: `Element ${a[j]} >= pivot ${pivot}: maintain position and advance scanner.`
             });
           }
         }
@@ -408,7 +451,7 @@ const ALGORITHMS = [
         steps.push({
           arr: [...a], low, high, pivotIdx: i + 1, placed: true,
           finalized: Array.from(finalized),
-          log: `Step ${steps.length + 1}: Place pivot ${a[i + 1]} into its final position at Box [${i + 1}]. Everything to its left is smaller, everything to its right is bigger!`
+          log: `Pivot placed: Pivot ${a[i + 1]} locked into final sorted index [${i + 1}].`
         });
         return i + 1;
       }
@@ -417,7 +460,7 @@ const ALGORITHMS = [
       for (let i = 0; i < arr.length; i++) finalized.add(i);
       steps.push({
         arr: [...arr], complete: true, finalized: Array.from(finalized),
-        log: `Done! Every number is in its correct place: [${arr.join(', ')}].`
+        log: `Complete: Array is fully sorted: [${arr.join(', ')}].`
       });
       return steps;
     },
@@ -440,7 +483,7 @@ const ALGORITHMS = [
         html += `
           <div class="sort-bar-col">
             <div class="${barClass}" style="height: ${heightPct}%;">${val}</div>
-            <span style="font-size: 10px; margin-top: 4px; color: #333; font-weight: bold;">[${idx}]</span>
+            <span style="font-size: 11px; margin-top: 6px; color: var(--text-secondary); font-weight: 600;">[${idx}]</span>
           </div>
         `;
       });
@@ -451,12 +494,20 @@ const ALGORITHMS = [
 
   {
     id: "job_sequencing",
-    name: "Job Sequencing",
-    assignment: "Lab 4",
+    name: "Job Sequencing with Deadlines",
+    category: "Greedy Algorithms",
     githubFile: "Job sequencing/Main.java",
     githubUrl: `${REPO_URL}/blob/main/Job%20sequencing/Main.java`,
-    concept: "Greedy strategy: sorts jobs from highest profit to lowest, and books each job at the very last free hour before its deadline (O(n^2)).",
-    complexity: { best: "O(n log n)", avg: "O(n^2)", worst: "O(n^2)", space: "O(d) [Slots table]" },
+    concept: "Sorts jobs by profit descending, greedily booking each job into the latest available time slot before its deadline.",
+    description: "Job Sequencing with Deadlines is a classic optimization problem. Given jobs with deadlines and profits, the goal is to maximize total profit earned under the constraint that each job takes 1 unit of time and only 1 job can be scheduled per slot.",
+    steps: [
+      "Sort all candidate jobs in descending order of profit.",
+      "Determine maximum deadline T_max to establish available discrete time slots [1..T_max].",
+      "For each job, search backwards from min(T_max, job.deadline) down to 1.",
+      "If an empty slot is found, assign the job to that slot and accumulate its profit.",
+      "If all valid slots are occupied, the job cannot be scheduled and is discarded."
+    ],
+    complexity: { best: "O(n log n)", avg: "O(n^2)", worst: "O(n^2)", space: "O(d)" },
     defaultParams: {
       jobs: [
         { id: "J1", deadline: 2, profit: 100 },
@@ -468,25 +519,28 @@ const ALGORITHMS = [
     },
     renderControls(container, params, onChange) {
       container.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 4px;">Select a Preset:</div>
-        <div class="preset-chips">
-          <button class="preset-chip" id="js-pre-1">💼 5-Job Lab Assignment</button>
-          <button class="preset-chip" id="js-pre-2">⚡ 4-Job Quick Test</button>
+        <div class="btn-chips">
+          <button class="btn-chip" id="js-pre-1">💼 5-Job Lab Assignment</button>
+          <button class="btn-chip" id="js-pre-2">⚡ 4-Job Quick Test</button>
         </div>
-        <div style="margin-top: 8px; font-weight: bold; margin-bottom: 4px;">Job List (ID, Deadline, Profit):</div>
-        <div id="js-job-table" style="max-height: 120px; overflow-y: auto; background: #fff; border: 1px solid #808080; padding: 4px;">
+        <div style="margin-top: 14px; margin-bottom: 8px;">
+          <label class="control-label">Editable Job Pool:</label>
+        </div>
+        <div id="js-job-table" style="max-height: 130px; overflow-y: auto; background: #fff; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 6px;">
           ${params.jobs.map((j, idx) => `
-            <div class="control-row" style="margin-bottom: 3px;">
-              <span style="font-weight: bold; width: 25px;">#${idx+1}</span>
-              <input type="text" class="win-input j-id" style="width: 45px;" value="${j.id}">
-              <span>Deadline:</span><input type="number" class="win-input j-dl" style="width: 40px;" min="1" max="6" value="${j.deadline}">
-              <span>Profit $:</span><input type="number" class="win-input j-pr" style="width: 50px;" min="1" value="${j.profit}">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+              <span style="font-weight: 600; width: 28px; font-size: 12px;">#${idx+1}</span>
+              <input type="text" class="text-input j-id" style="width: 60px; padding: 4px 8px;" value="${j.id}">
+              <span style="font-size: 12px; color: var(--text-secondary);">Deadline:</span>
+              <input type="number" class="text-input j-dl" style="width: 50px; padding: 4px 8px;" min="1" max="6" value="${j.deadline}">
+              <span style="font-size: 12px; color: var(--text-secondary);">Profit $:</span>
+              <input type="number" class="text-input j-pr" style="width: 65px; padding: 4px 8px;" min="1" value="${j.profit}">
             </div>
           `).join('')}
         </div>
-        <div style="display: flex; gap: 4px; margin-top: 6px;">
-          <button id="js-add-btn" class="win-btn small">+ Add Job</button>
-          <button id="js-apply-btn" class="win-btn small">Apply Changes</button>
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <button id="js-add-btn" class="btn-action">+ Add Job</button>
+          <button id="js-apply-btn" class="btn-action primary">Apply Changes</button>
         </div>
       `;
       const readJobs = () => {
@@ -537,7 +591,7 @@ const ALGORITHMS = [
 
       steps.push({
         jobs: [...jobs], slots: [...slots], totalProfit: 0, currentJob: null,
-        log: `Step 1: Sort all jobs by profit (highest first): [${jobs.map(j => `${j.id} ($${j.profit})`).join(', ')}]. We have ${maxDeadline} available time slots.`
+        log: `Step 1: Jobs sorted by profit descending: [${jobs.map(j => `${j.id} ($${j.profit})`).join(', ')}]. Total available slots: ${maxDeadline}.`
       });
 
       for (let i = 0; i < jobs.length; i++) {
@@ -556,19 +610,19 @@ const ALGORITHMS = [
         if (assignedSlot !== -1) {
           steps.push({
             jobs: [...jobs], slots: [...slots], totalProfit, currentJob: job, slot: assignedSlot,
-            log: `Step ${steps.length + 1}: Job ${job.id} pays $${job.profit} and is due at time ${job.deadline}. Slot ${assignedSlot} is free, so we schedule it there! Total profit is now $${totalProfit}.`
+            log: `Step ${steps.length + 1}: Job ${job.id} (Profit $${job.profit}, Deadline ${job.deadline}) assigned to Slot ${assignedSlot}. Total profit is now $${totalProfit}.`
           });
         } else {
           steps.push({
             jobs: [...jobs], slots: [...slots], totalProfit, currentJob: job, slot: null, rejected: true,
-            log: `Step ${steps.length + 1}: Job ${job.id} pays $${job.profit}, but all slots up to deadline ${job.deadline} are already taken. Skip this job!`
+            log: `Step ${steps.length + 1}: Job ${job.id} (Profit $${job.profit}) rejected. All slots <= deadline ${job.deadline} are already filled.`
           });
         }
       }
 
       steps.push({
         jobs: [...jobs], slots: [...slots], totalProfit, complete: true,
-        log: `Complete! All jobs evaluated. Maximum possible profit earned is $${totalProfit}!`
+        log: `Complete: Optimal job schedule determined! Maximum total profit earned: $${totalProfit}.`
       });
       return steps;
     },
@@ -577,7 +631,7 @@ const ALGORITHMS = [
       const maxSlots = slots.length - 1;
       let html = `
         <div class="gantt-grid">
-          <div style="font-weight: bold; font-size: 11.5px; margin-bottom: 4px;">Time Slots on Schedule (Hour 1 to ${maxSlots}):</div>
+          <div style="font-weight: 600; font-size: 13px; color: var(--text-secondary);">Schedule Timeline (Slot 1 to ${maxSlots}):</div>
           <div class="gantt-slots-row">
       `;
       for (let s = 1; s <= maxSlots; s++) {
@@ -585,15 +639,15 @@ const ALGORITHMS = [
         html += `
           <div class="gantt-slot ${j ? 'filled' : ''}">
             <span class="gantt-slot-num">Slot ${s}</span>
-            ${j ? `<span class="gantt-job-name">${j.id}</span><span class="gantt-job-profit">+$${j.profit}</span>` : '<span style="color:#aaa;">Available</span>'}
+            ${j ? `<span class="gantt-job-name">${j.id}</span><span class="gantt-job-profit">+$${j.profit}</span>` : '<span style="color:#aaa; font-size:12px;">Free</span>'}
           </div>
         `;
       }
       html += `
           </div>
-          <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; background: #ffffd0; padding: 8px; border: 1px solid #888;">
-            <span><b>Total Money Earned:</b> <span style="font-size: 15px; color: #008000; font-weight: bold;">$${step.totalProfit}</span></span>
-            <span><b>Currently Considering:</b> ${step.currentJob ? `<span style="font-weight: bold; color: #000080;">${step.currentJob.id} (Profit: $${step.currentJob.profit}, Due: Slot ${step.currentJob.deadline})</span>` : 'None'}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 12px 16px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+            <span><b>Cumulative Profit:</b> <span style="font-size: 18px; color: #1a7f37; font-weight: 700; margin-left: 6px;">$${step.totalProfit}</span></span>
+            <span><b>Active Job:</b> ${step.currentJob ? `<span style="font-weight: 600; color: var(--color-primary);">${step.currentJob.id} (Profit: $${step.currentJob.profit}, Due: Slot ${step.currentJob.deadline})</span>` : 'None'}</span>
           </div>
         </div>
       `;
@@ -603,11 +657,19 @@ const ALGORITHMS = [
 
   {
     id: "prims_mst",
-    name: "Prim's Algorithm (MST)",
-    assignment: "Assignment 8",
+    name: "Prim's Minimum Spanning Tree",
+    category: "Greedy Algorithms",
     githubFile: "Assignment 8 - Prims/Main.java",
     githubUrl: `${REPO_URL}/blob/main/Assignment%208%20-%20Prims/Main.java`,
-    concept: "Starts at one city, then keeps adding the cheapest available road that connects an unvisited city to the network (O(V^2)).",
+    concept: "Grows a Minimum Spanning Tree from a starting node by greedily absorbing the lowest-weight cut edge.",
+    description: "Prim's algorithm finds a Minimum Spanning Tree (MST) for a connected, weighted undirected graph. Starting from any arbitrary source node, it grows a single tree by repeatedly picking the cheapest edge connecting an already-visited node to an unvisited node.",
+    steps: [
+      "Select an arbitrary starting root vertex and add it to the visited set.",
+      "Identify all cut edges: edges with one endpoint in visited and one endpoint in unvisited.",
+      "Select the edge with the minimal edge weight among all valid cut edges.",
+      "Add the selected edge to the MST and mark the newly reached vertex as visited.",
+      "Repeat until all V vertices are in the visited set (tree has exactly V - 1 edges)."
+    ],
     complexity: { best: "O(E log V)", avg: "O(V^2)", worst: "O(V^2)", space: "O(V)" },
     defaultParams: {
       numVertices: 5,
@@ -622,17 +684,16 @@ const ALGORITHMS = [
     },
     renderControls(container, params, onChange) {
       container.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 4px;">Choose Graph Layout:</div>
-        <div class="preset-chips">
-          <button class="preset-chip" id="pm-pre-5">🏙️ 5-City Network</button>
-          <button class="preset-chip" id="pm-pre-4">🔺 4-City Loop</button>
-          <button class="preset-chip" id="pm-pre-6">🌐 6-City Web</button>
+        <div class="btn-chips">
+          <button class="btn-chip" id="pm-pre-5">🏙️ 5-Node Network</button>
+          <button class="btn-chip" id="pm-pre-4">🔺 4-Node Ring</button>
+          <button class="btn-chip" id="pm-pre-6">🌐 6-Node Graph</button>
         </div>
-        <div style="margin-top: 8px;">
-          <label><b>Start City:</b></label>
-          <div style="display: flex; gap: 4px; margin-top: 3px;">
+        <div style="margin-top: 14px;">
+          <label class="control-label">Select Starting Vertex:</label>
+          <div class="btn-chips">
             ${Array.from({length: params.numVertices}, (_, i) => `
-              <button class="preset-chip ${i === params.startNode ? 'active' : ''}" style="${i === params.startNode ? 'background: #000080; color: #fff;' : ''}" data-node="${i}">Node ${i}</button>
+              <button class="btn-chip ${i === params.startNode ? 'active' : ''}" data-node="${i}">Node ${i}</button>
             `).join('')}
           </div>
         </div>
@@ -693,7 +754,7 @@ const ALGORITHMS = [
 
       steps.push({
         visited: Array.from(visited), mstEdges: [], candidateEdges: [], totalCost: 0,
-        log: `Step 1: Start at Node ${start}. Currently connected nodes: [${start}]. Look for the cheapest road to any new node.`
+        log: `Step 1: Initialize Prim's MST starting at Node ${start}. Visited set: {${start}}.`
       });
 
       while (visited.size < V) {
@@ -727,20 +788,20 @@ const ALGORITHMS = [
           candidateEdges: candidates,
           addedEdge: { u: bestU, v: bestV, w: minWeight },
           totalCost,
-          log: `Step ${steps.length + 1}: The cheapest road connects Node ${bestU} to new Node ${bestV} with weight ${minWeight}. Add it to our tree! Total tree cost: ${totalCost}.`
+          log: `Step ${steps.length + 1}: Minimum cut edge is (${bestU} <-> ${bestV}) with weight ${minWeight}. Added Node ${bestV} to tree. Total MST cost: ${totalCost}.`
         });
       }
 
       steps.push({
         visited: Array.from(visited), mstEdges: [...mstEdges], totalCost, complete: true,
-        log: `Done! All ${V} nodes are now connected with the absolute minimum total road weight of ${totalCost}!`
+        log: `Complete: MST constructed with ${mstEdges.length} edges. Total Minimum Spanning Tree Weight: ${totalCost}.`
       });
       return steps;
     },
     renderStep(stage, step, params) {
       const V = params.numVertices;
       const mat = params.matrix;
-      const cx = 170, cy = 150, r = 110;
+      const cx = 160, cy = 150, r = 105;
       const nodeCoords = [];
       for (let i = 0; i < V; i++) {
         const angle = (2 * Math.PI / V) * i - Math.PI / 2;
@@ -763,7 +824,7 @@ const ALGORITHMS = [
 
             edgesSvg += `
               <line class="${cls}" x1="${nodeCoords[i].x}" y1="${nodeCoords[i].y}" x2="${nodeCoords[j].x}" y2="${nodeCoords[j].y}" />
-              <rect x="${mx - 9}" y="${my - 8}" width="18" height="15" fill="#ffffff" stroke="#999" rx="2" />
+              <rect x="${mx - 10}" y="${my - 9}" width="20" height="18" fill="#ffffff" stroke="var(--border-subtle)" rx="4" />
               <text class="graph-edge-text" x="${mx}" y="${my}">${w}</text>
             `;
           }
@@ -780,20 +841,20 @@ const ALGORITHMS = [
       });
 
       stage.innerHTML = `
-        <div style="display: flex; gap: 12px; width: 100%; align-items: center; justify-content: space-around; flex-wrap: wrap;">
-          <svg class="graph-svg" viewBox="0 0 340 300" style="max-width: 340px; height: 300px;">
+        <div style="display: flex; gap: 24px; width: 100%; align-items: center; justify-content: space-around; flex-wrap: wrap;">
+          <svg class="graph-svg" viewBox="0 0 320 300">
             ${edgesSvg}
             ${nodesSvg}
           </svg>
-          <div style="min-width: 200px; background: #e8e8e8; border: 2px inset #808080; padding: 8px; font-size: 11px;">
-            <div style="font-weight: bold; color: #000080; margin-bottom: 4px;">Connected Network:</div>
-            <div><b>Visited Nodes:</b> [${step.visited.join(', ')}]</div>
-            <div><b>Roads Built:</b> ${step.mstEdges.length} of ${V - 1}</div>
-            <div style="margin-top: 4px;"><b>Roads in Spanning Tree:</b></div>
-            <ul style="margin-left: 14px; font-family: var(--font-mono); font-size: 10.5px;">
-              ${step.mstEdges.map(e => `<li>(${e.u} <-> ${e.v}) cost: ${e.w}</li>`).join('') || '<li>(None yet)</li>'}
+          <div style="min-width: 230px; background: #ffffff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px;">
+            <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">MST State:</div>
+            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 4px;"><b>Visited Nodes:</b> {${step.visited.join(', ')}}</div>
+            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;"><b>Tree Edges:</b> ${step.mstEdges.length} / ${V - 1}</div>
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Selected Edges:</div>
+            <ul style="margin-left: 16px; margin-top: 4px; font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);">
+              ${step.mstEdges.map(e => `<li>(${e.u} <-> ${e.v}) wt: ${e.w}</li>`).join('') || '<li>(None yet)</li>'}
             </ul>
-            <div style="margin-top: 6px; font-weight: bold; color: #008000; font-size: 12px;">Total Cost: ${step.totalCost}</div>
+            <div style="margin-top: 12px; font-weight: 700; color: #1a7f37; font-size: 15px;">Total Weight: ${step.totalCost}</div>
           </div>
         </div>
       `;
@@ -802,11 +863,20 @@ const ALGORITHMS = [
 
   {
     id: "dijkstra",
-    name: "Dijkstra's Algorithm",
-    assignment: "Assignment 9",
+    name: "Dijkstra's Shortest Path",
+    category: "Greedy Algorithms",
     githubFile: "Assignment 9 - Djikstra/Main.java",
     githubUrl: `${REPO_URL}/blob/main/Assignment%209%20-%20Djikstra/Main.java`,
-    concept: "Finds the shortest driving route from a starting point to every other point, greedily locking in the closest unvisited point next (O(V^2)).",
+    concept: "Computes the shortest paths from a single source vertex to all other vertices by greedily finalizing nearest unvisited nodes.",
+    description: "Dijkstra's algorithm solves the single-source shortest path problem on graphs with non-negative edge weights. It maintains tentative distances and iteratively locks in the closest unvisited vertex, relaxing its outgoing edges.",
+    steps: [
+      "Initialize distance array: dist[source] = 0, and all other dist[v] = Infinity.",
+      "Select unvisited vertex u with the smallest tentative distance dist[u].",
+      "Mark vertex u as finalized (visited).",
+      "For each unvisited neighbor v of u: check if dist[u] + weight(u, v) < dist[v].",
+      "If shorter, update dist[v] = dist[u] + weight(u, v) and record u as predecessor.",
+      "Repeat until all reachable vertices are visited."
+    ],
     complexity: { best: "O((V+E) log V)", avg: "O(V^2)", worst: "O(V^2)", space: "O(V)" },
     defaultParams: {
       numVertices: 5,
@@ -821,16 +891,15 @@ const ALGORITHMS = [
     },
     renderControls(container, params, onChange) {
       container.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 4px;">Select Network Preset:</div>
-        <div class="preset-chips">
-          <button class="preset-chip" id="dj-pre-5">🏙️ 5-City Map</button>
-          <button class="preset-chip" id="dj-pre-4">🔷 4-City Diamond</button>
+        <div class="btn-chips">
+          <button class="btn-chip" id="dj-pre-5">🏙️ 5-Node Map</button>
+          <button class="btn-chip" id="dj-pre-4">🔷 4-Node Diamond</button>
         </div>
-        <div style="margin-top: 8px;">
-          <label><b>Choose Starting Node:</b></label>
-          <div style="display: flex; gap: 4px; margin-top: 3px;">
+        <div style="margin-top: 14px;">
+          <label class="control-label">Select Source Vertex:</label>
+          <div class="btn-chips">
             ${Array.from({length: params.numVertices}, (_, i) => `
-              <button class="preset-chip" style="${i === params.source ? 'background: #000080; color: #fff;' : ''}" data-src="${i}">Node ${i}</button>
+              <button class="btn-chip ${i === params.source ? 'active' : ''}" data-src="${i}">Node ${i}</button>
             `).join('')}
           </div>
         </div>
@@ -878,7 +947,7 @@ const ALGORITHMS = [
       const steps = [];
       steps.push({
         dist: [...dist], visited: [...visited], prev: [...prev], u: -1,
-        log: `Step 1: Distance to starting Node ${src} is 0. All other nodes set to Infinity (unknown).`
+        log: `Step 1: Initialize dist[${src}] = 0. All other vertices set to Infinity.`
       });
 
       for (let count = 0; count < V; count++) {
@@ -896,7 +965,7 @@ const ALGORITHMS = [
         visited[u] = true;
         steps.push({
           dist: [...dist], visited: [...visited], prev: [...prev], u,
-          log: `Step ${steps.length + 1}: Pick the closest unvisited node: Node ${u} with shortest known distance of ${dist[u]}. Lock it in as visited!`
+          log: `Step ${steps.length + 1}: Finalize Node ${u} with minimal known distance ${dist[u]}.`
         });
 
         for (let v = 0; v < V; v++) {
@@ -906,7 +975,7 @@ const ALGORITHMS = [
             prev[v] = u;
             steps.push({
               dist: [...dist], visited: [...visited], prev: [...prev], u, relaxedV: v,
-              log: `Step ${steps.length + 1}: Found a faster shortcut to Node ${v} via Node ${u}! New shortest distance is ${dist[v]} (was ${dist[v] === Infinity ? 'INF' : 'longer'}).`
+              log: `Step ${steps.length + 1}: Relax edge (${u} -> ${v}). Found shorter path to Node ${v} with distance ${dist[v]} via Node ${u}.`
             });
           }
         }
@@ -914,14 +983,14 @@ const ALGORITHMS = [
 
       steps.push({
         dist: [...dist], visited: [...visited], prev: [...prev], complete: true,
-        log: `Done! Shortest possible path to every single node from Node ${src} is computed!`
+        log: `Complete: Shortest paths from Node ${src} to all vertices computed.`
       });
       return steps;
     },
     renderStep(stage, step, params) {
       const V = params.numVertices;
       const mat = params.matrix;
-      const cx = 170, cy = 150, r = 110;
+      const cx = 160, cy = 150, r = 105;
       const nodeCoords = [];
       for (let i = 0; i < V; i++) {
         const angle = (2 * Math.PI / V) * i - Math.PI / 2;
@@ -944,7 +1013,7 @@ const ALGORITHMS = [
 
             edgesSvg += `
               <line class="${cls}" x1="${nodeCoords[i].x}" y1="${nodeCoords[i].y}" x2="${nodeCoords[j].x}" y2="${nodeCoords[j].y}" />
-              <rect x="${mx - 9}" y="${my - 8}" width="18" height="15" fill="#ffffff" stroke="#999" rx="2" />
+              <rect x="${mx - 10}" y="${my - 9}" width="20" height="18" fill="#ffffff" stroke="var(--border-subtle)" rx="4" />
               <text class="graph-edge-text" x="${mx}" y="${my}">${w}</text>
             `;
           }
@@ -966,22 +1035,22 @@ const ALGORITHMS = [
       });
 
       stage.innerHTML = `
-        <div style="display: flex; gap: 12px; width: 100%; align-items: center; justify-content: space-around; flex-wrap: wrap;">
-          <svg class="graph-svg" viewBox="0 0 340 300" style="max-width: 340px; height: 300px;">
+        <div style="display: flex; gap: 24px; width: 100%; align-items: center; justify-content: space-around; flex-wrap: wrap;">
+          <svg class="graph-svg" viewBox="0 0 320 300">
             ${edgesSvg}
             ${nodesSvg}
           </svg>
-          <div style="min-width: 220px; background: #e8e8e8; border: 2px inset #808080; padding: 8px; font-size: 11px;">
-            <div style="font-weight: bold; color: #000080; margin-bottom: 6px;">Shortest Distances from Node ${params.source}:</div>
+          <div style="min-width: 250px; background: #ffffff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px;">
+            <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 10px;">Shortest Path Table:</div>
             <table class="matrix-table" style="width: 100%; margin: 0;">
               <thead>
-                <tr><th>Destination</th><th>Distance</th><th>Previous Stop</th></tr>
+                <tr><th>Node</th><th>Shortest Distance</th><th>Predecessor</th></tr>
               </thead>
               <tbody>
                 ${step.dist.map((d, idx) => `
-                  <tr style="${step.visited[idx] ? 'background: #eef8ee;' : ''}">
+                  <tr style="${step.visited[idx] ? 'background: #f0fdf4;' : ''}">
                     <td><b>Node ${idx}</b></td>
-                    <td style="font-weight: bold; color: ${d === Infinity ? '#999' : '#000080'}">${d === Infinity ? 'Unreachable' : d}</td>
+                    <td style="font-weight: 700; color: ${d === Infinity ? '#999' : 'var(--color-primary)'};">${d === Infinity ? 'INF' : d}</td>
                     <td>${step.prev[idx] === -1 ? '-' : `Node ${step.prev[idx]}`}</td>
                   </tr>
                 `).join('')}
@@ -994,22 +1063,155 @@ const ALGORITHMS = [
   },
 
   {
+    id: "floyd_warshall",
+    name: "Floyd-Warshall Algorithm",
+    category: "Dynamic Programming",
+    githubFile: "Assignment 11 - Floyd-Warshall/Main.java",
+    githubUrl: `${REPO_URL}/blob/main/Assignment%2011%20-%20Floyd-Warshall/Main.java`,
+    concept: "Dynamic programming approach calculating all-pairs shortest paths through intermediate vertices k in [0..V-1].",
+    description: "Floyd-Warshall solves the all-pairs shortest path problem in O(V^3) time. It uses dynamic programming to check whether a path between any pair of vertices (i, j) can be shortened by routing through an intermediate vertex k.",
+    steps: [
+      "Initialize distance matrix D(0) with direct edge weights; set D[i][j] = INF if no edge exists, and D[i][i] = 0.",
+      "Iterate intermediate vertex k from 0 to V - 1.",
+      "For every pair of vertices (i, j): check if D[i][k] + D[k][j] < D[i][j].",
+      "If shorter, update D[i][j] = D[i][k] + D[k][j].",
+      "After V iterations, D(V) contains the shortest path distances between all pairs."
+    ],
+    complexity: { best: "O(V^3)", avg: "O(V^3)", worst: "O(V^3)", space: "O(V^2)" },
+    defaultParams: {
+      numVertices: 4,
+      matrix: [
+        [0, 5, 999, 10],
+        [999, 0, 3, 999],
+        [999, 999, 0, 1],
+        [999, 999, 999, 0]
+      ]
+    },
+    renderControls(container, params, onChange) {
+      container.innerHTML = `
+        <div class="btn-chips">
+          <button class="btn-chip" id="fw-pre-4">🗺️ 4-Node Network</button>
+          <button class="btn-chip" id="fw-pre-3">🔺 3-Node Triangle</button>
+        </div>
+      `;
+      container.querySelector('#fw-pre-4').onclick = () => {
+        onChange({
+          numVertices: 4,
+          matrix: [
+            [0, 5, 999, 10],
+            [999, 0, 3, 999],
+            [999, 999, 0, 1],
+            [999, 999, 999, 0]
+          ]
+        });
+      };
+      container.querySelector('#fw-pre-3').onclick = () => {
+        onChange({
+          numVertices: 3,
+          matrix: [
+            [0, 4, 11],
+            [6, 0, 2],
+            [3, 999, 0]
+          ]
+        });
+      };
+    },
+    computeSteps(params) {
+      const V = params.numVertices;
+      const dist = params.matrix.map(r => [...r]);
+      const steps = [];
+
+      steps.push({
+        D: dist.map(r => [...r]), k: -1, i: -1, j: -1,
+        log: `Step 1: Initial Distance Matrix D(0). INF indicates no direct edge.`
+      });
+
+      for (let k = 0; k < V; k++) {
+        steps.push({
+          D: dist.map(r => [...r]), k, i: -1, j: -1, phaseStart: true,
+          log: `Phase ${k + 1}: Using Node ${k} as intermediate waypoint.`
+        });
+
+        for (let i = 0; i < V; i++) {
+          for (let j = 0; j < V; j++) {
+            if (dist[i][k] !== 999 && dist[k][j] !== 999 && dist[i][k] + dist[k][j] < dist[i][j]) {
+              const oldVal = dist[i][j];
+              dist[i][j] = dist[i][k] + dist[k][j];
+              steps.push({
+                D: dist.map(r => [...r]), k, i, j, updated: true,
+                log: `Updated D[${i}][${j}] from ${oldVal === 999 ? 'INF' : oldVal} to ${dist[i][j]} via intermediate Node ${k}.`
+              });
+            }
+          }
+        }
+      }
+
+      steps.push({
+        D: dist.map(r => [...r]), k: V, complete: true,
+        log: `Complete: Matrix D(${V}) holds all-pairs shortest distances.`
+      });
+      return steps;
+    },
+    renderStep(stage, step, params) {
+      const V = params.numVertices;
+      const D = step.D;
+      let html = `
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <div style="font-weight: 600; font-size: 13px; color: var(--text-secondary);">
+            ${step.k === -1 ? 'Initial Adjacency Matrix D(0)' : `Matrix D(${step.k + 1}): Intermediate Node ${step.k < V ? step.k : 'Finished'}`}
+          </div>
+          <table class="matrix-table">
+            <thead>
+              <tr><th>From / To</th>${Array.from({length: V}, (_, j) => `<th>Node ${j}</th>`).join('')}</tr>
+            </thead>
+            <tbody>
+      `;
+      for (let i = 0; i < V; i++) {
+        html += `<tr><th>Node ${i}</th>`;
+        for (let j = 0; j < V; j++) {
+          const isK = (step.k !== -1 && (i === step.k || j === step.k));
+          const isUpdated = (step.i === i && step.j === j);
+          let cls = "";
+          if (isUpdated) cls = "updated-cell";
+          else if (isK) cls = "highlight-k";
+          html += `<td class="${cls}">${D[i][j] >= 999 ? 'INF' : D[i][j]}</td>`;
+        }
+        html += `</tr>`;
+      }
+      html += `
+            </tbody>
+          </table>
+          <div style="font-size: 12px; color: var(--text-muted);">Highlighted row/column corresponds to intermediate hub Node ${step.k !== -1 ? step.k : 'none'}.</div>
+        </div>
+      `;
+      stage.innerHTML = html;
+    }
+  },
+
+  {
     id: "sudoku",
     name: "Sudoku Solver",
-    assignment: "Assignment 10",
+    category: "Backtracking",
     githubFile: "Assignment 10 - Sudoku/Main.java",
     githubUrl: `${REPO_URL}/blob/main/Assignment%2010%20-%20Sudoku/Main.java`,
-    concept: "Fills empty cells by guessing digits 1 to 9; if it hits an impossible dead end, it erases the guess and backtracks (O(9^(N^2))).",
-    complexity: { best: "O(1)", avg: "O(9^m)", worst: "O(9^(N*N))", space: "O(N*N) [Grid memory]" },
+    concept: "Recursive depth-first backtracking search placing digits 1 to 9 in empty cells obeying row, column, and 3x3 box rules.",
+    description: "The Sudoku Solver is a textbook example of recursive backtracking. When an empty cell is reached, the algorithm tests numbers 1-9. If all constraints hold, it moves forward. If a conflict arises down the decision tree, it erases the candidate and backtracks.",
+    steps: [
+      "Find the next empty cell (value 0). If no empty cells remain, the puzzle is solved!",
+      "For numbers 1 to 9: test if placing number is valid (isSafe).",
+      "Check: Number must not appear in the current row, current column, or 3x3 subgrid.",
+      "If valid, assign the number and recursively attempt to solve the remaining board.",
+      "If the recursive call fails, undo the assignment (backtrack to 0) and try the next number."
+    ],
+    complexity: { best: "O(1)", avg: "O(9^m)", worst: "O(9^(N*N))", space: "O(N*N)" },
     defaultParams: {
       preset: "easy"
     },
     renderControls(container, params, onChange) {
       container.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 4px;">Choose Puzzle:</div>
-        <div class="preset-chips">
-          <button class="preset-chip" id="sd-pre-easy">🌟 Easy Demo (Fast)</button>
-          <button class="preset-chip" id="sd-pre-med">🧩 Classic Puzzle</button>
+        <div class="btn-chips">
+          <button class="btn-chip ${params.preset === 'easy' ? 'active' : ''}" id="sd-pre-easy">🌟 Easy Demo (Fast)</button>
+          <button class="btn-chip ${params.preset === 'medium' ? 'active' : ''}" id="sd-pre-med">🧩 Classic Puzzle</button>
         </div>
       `;
       container.querySelector('#sd-pre-easy').onclick = () => onChange({ preset: "easy" });
@@ -1046,7 +1248,7 @@ const ALGORITHMS = [
 
       steps.push({
         board: board.map(r => [...r]), initial, r: -1, c: -1, val: 0,
-        log: `Step 1: Loaded starting clues (in Blue). We will test numbers 1 to 9 in the empty spaces.`
+        log: `Step 1: Initial clues loaded. Testing candidate digits 1 to 9 in empty cells.`
       });
 
       function isSafe(b, row, col, num) {
@@ -1074,7 +1276,7 @@ const ALGORITHMS = [
                   if (steps.length < stepCap) {
                     steps.push({
                       board: b.map(r => [...r]), initial, r: row, c: col, val: num,
-                      log: `Step ${steps.length + 1}: Try placing ${num} at Row ${row+1}, Column ${col+1}. No clashes with row, column or box!`
+                      log: `Trial placement: cell (${row + 1}, ${col + 1}) = ${num} satisfies all row, column, and box constraints.`
                     });
                   }
                   if (solve(b)) return true;
@@ -1082,7 +1284,7 @@ const ALGORITHMS = [
                   if (steps.length < stepCap) {
                     steps.push({
                       board: b.map(r => [...r]), initial, r: row, c: col, val: 0, backtrack: true,
-                      log: `Step ${steps.length + 1} (Backtrack): Dead end reached later! Erase ${num} from Row ${row+1}, Column ${col+1} and try next option.`
+                      log: `Backtracking: Conflict reached down branch. Erase cell (${row + 1}, ${col + 1}) and test next digit.`
                     });
                   }
                 }
@@ -1097,7 +1299,7 @@ const ALGORITHMS = [
       solve(board);
       steps.push({
         board: board.map(r => [...r]), initial, complete: true,
-        log: `Solved! Every row, column, and 3x3 box has numbers 1 to 9 with zero conflicts!`
+        log: `Solved! Sudoku board satisfied with zero constraint violations.`
       });
       return steps;
     },
@@ -1125,131 +1327,20 @@ const ALGORITHMS = [
   },
 
   {
-    id: "floyd_warshall",
-    name: "Floyd-Warshall",
-    assignment: "Assignment 11",
-    githubFile: "Assignment 11 - Floyd-Warshall/Main.java",
-    githubUrl: `${REPO_URL}/blob/main/Assignment%2011%20-%20Floyd-Warshall/Main.java`,
-    concept: "Checks every pair of cities to see if stopping at an intermediate city (City K) makes the total trip shorter (O(V^3)).",
-    complexity: { best: "O(V^3)", avg: "O(V^3)", worst: "O(V^3)", space: "O(V^2)" },
-    defaultParams: {
-      numVertices: 4,
-      matrix: [
-        [0, 5, 999, 10],
-        [999, 0, 3, 999],
-        [999, 999, 0, 1],
-        [999, 999, 999, 0]
-      ]
-    },
-    renderControls(container, params, onChange) {
-      container.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 4px;">Select Route Preset:</div>
-        <div class="preset-chips">
-          <button class="preset-chip" id="fw-pre-4">🗺️ 4-City Route Map</button>
-          <button class="preset-chip" id="fw-pre-3">🔺 3-City Triangle</button>
-        </div>
-      `;
-      container.querySelector('#fw-pre-4').onclick = () => {
-        onChange({
-          numVertices: 4,
-          matrix: [
-            [0, 5, 999, 10],
-            [999, 0, 3, 999],
-            [999, 999, 0, 1],
-            [999, 999, 999, 0]
-          ]
-        });
-      };
-      container.querySelector('#fw-pre-3').onclick = () => {
-        onChange({
-          numVertices: 3,
-          matrix: [
-            [0, 4, 11],
-            [6, 0, 2],
-            [3, 999, 0]
-          ]
-        });
-      };
-    },
-    computeSteps(params) {
-      const V = params.numVertices;
-      const dist = params.matrix.map(r => [...r]);
-      const steps = [];
-
-      steps.push({
-        D: dist.map(r => [...r]), k: -1, i: -1, j: -1,
-        log: `Step 1: Starting distance table. Direct routes are filled in; INF means no direct path yet.`
-      });
-
-      for (let k = 0; k < V; k++) {
-        steps.push({
-          D: dist.map(r => [...r]), k, i: -1, j: -1, phaseStart: true,
-          log: `Phase ${k + 1}: Try using City ${k} as a middle stopover for all pairs of cities.`
-        });
-
-        for (let i = 0; i < V; i++) {
-          for (let j = 0; j < V; j++) {
-            if (dist[i][k] !== 999 && dist[k][j] !== 999 && dist[i][k] + dist[k][j] < dist[i][j]) {
-              const oldVal = dist[i][j];
-              dist[i][j] = dist[i][k] + dist[k][j];
-              steps.push({
-                D: dist.map(r => [...r]), k, i, j, updated: true,
-                log: `Shortcut found! Traveling from City ${i} to City ${j} by stopping at City ${k} takes only ${dist[i][j]} (was ${oldVal === 999 ? 'INF' : oldVal}).`
-              });
-            }
-          }
-        }
-      }
-
-      steps.push({
-        D: dist.map(r => [...r]), k: V, complete: true,
-        log: `Finished! The table now holds the absolute shortest travel distance between every pair of cities.`
-      });
-      return steps;
-    },
-    renderStep(stage, step, params) {
-      const V = params.numVertices;
-      const D = step.D;
-      let html = `
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div style="font-weight: bold; font-size: 11.5px;">
-            ${step.k === -1 ? 'Initial Direct Distances' : `Middle Stopover City: Node ${step.k < V ? step.k : 'Complete'}`}
-          </div>
-          <table class="matrix-table">
-            <thead>
-              <tr><th>From / To</th>${Array.from({length: V}, (_, j) => `<th>City ${j}</th>`).join('')}</tr>
-            </thead>
-            <tbody>
-      `;
-      for (let i = 0; i < V; i++) {
-        html += `<tr><th>City ${i}</th>`;
-        for (let j = 0; j < V; j++) {
-          const isK = (step.k !== -1 && (i === step.k || j === step.k));
-          const isUpdated = (step.i === i && step.j === j);
-          let cls = "";
-          if (isUpdated) cls = "updated-cell";
-          else if (isK) cls = "highlight-k";
-          html += `<td class="${cls}">${D[i][j] >= 999 ? 'INF' : D[i][j]}</td>`;
-        }
-        html += `</tr>`;
-      }
-      html += `
-            </tbody>
-          </table>
-          <div style="font-size: 10.5px; color: #444;">Yellow = Row & Column of intermediate stopover City ${step.k !== -1 ? step.k : 'None'}, Green = Shorter route discovered!</div>
-        </div>
-      `;
-      stage.innerHTML = html;
-    }
-  },
-
-  {
     id: "n_queens",
-    name: "N-Queens",
-    assignment: "Assignment 12",
+    name: "N-Queens Problem",
+    category: "Backtracking",
     githubFile: "Assignment 12 - N queens/Main.java",
     githubUrl: `${REPO_URL}/blob/main/Assignment%2012%20-%20N%20queens/Main.java`,
-    concept: "Places Queens row-by-row on the board, ensuring no two queens share the same column or diagonal line of sight (O(N!)).",
+    concept: "Row-by-row backtracking placement ensuring no two queens share the same column or diagonal line of sight.",
+    description: "The N-Queens problem asks how to place N non-attacking chess queens on an N x N chessboard. Because each row must have exactly one queen, the algorithm iterates row by row, testing column placements that avoid vertical and diagonal attacks.",
+    steps: [
+      "Start at row 0.",
+      "For each column col from 0 to N - 1: check if placing a queen at (row, col) is safe.",
+      "isSafe check: Ensure no previously placed queen shares column col or diagonal |queen[i] - col| == row - i.",
+      "If safe, place queen at (row, col) and recurse to row + 1.",
+      "If row == N, a valid solution is recorded. Backtrack to find all remaining solutions."
+    ],
     complexity: { best: "O(N)", avg: "O(N!)", worst: "O(N!)", space: "O(N)" },
     defaultParams: {
       N: 4,
@@ -1257,12 +1348,11 @@ const ALGORITHMS = [
     },
     renderControls(container, params, onChange) {
       container.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 4px;">Select Board Size:</div>
-        <div class="preset-chips">
-          <button class="preset-chip" style="${params.N === 4 ? 'background: #000080; color: #fff;' : ''}" data-n="4">4x4 (2 solutions)</button>
-          <button class="preset-chip" style="${params.N === 5 ? 'background: #000080; color: #fff;' : ''}" data-n="5">5x5 (10 solutions)</button>
-          <button class="preset-chip" style="${params.N === 6 ? 'background: #000080; color: #fff;' : ''}" data-n="6">6x6 (4 solutions)</button>
-          <button class="preset-chip" style="${params.N === 8 ? 'background: #000080; color: #fff;' : ''}" data-n="8">8x8 (92 solutions)</button>
+        <div class="btn-chips">
+          <button class="btn-chip ${params.N === 4 ? 'active' : ''}" data-n="4">4x4 (2 solutions)</button>
+          <button class="btn-chip ${params.N === 5 ? 'active' : ''}" data-n="5">5x5 (10 solutions)</button>
+          <button class="btn-chip ${params.N === 6 ? 'active' : ''}" data-n="6">6x6 (4 solutions)</button>
+          <button class="btn-chip ${params.N === 8 ? 'active' : ''}" data-n="8">8x8 (92 solutions)</button>
         </div>
       `;
 
@@ -1287,7 +1377,7 @@ const ALGORITHMS = [
 
       steps.push({
         queen: [...queen], N, row: -1, col: -1,
-        log: `Step 1: Board size is ${N}x${N}. Place ${N} queens so none can attack each other!`
+        log: `Step 1: Initialize ${N}x${N} chessboard. Place ${N} queens without mutual threats.`
       });
 
       let stepCap = 250;
@@ -1296,7 +1386,7 @@ const ALGORITHMS = [
           solutionsCount++;
           steps.push({
             queen: [...queen], N, complete: true, solNum: solutionsCount,
-            log: `SUCCESS! Solution #${solutionsCount} found with all ${N} Queens placed safely!`
+            log: `SUCCESS: Solution #${solutionsCount} found with all ${N} queens placed safely!`
           });
           return;
         }
@@ -1307,7 +1397,7 @@ const ALGORITHMS = [
             if (steps.length < stepCap) {
               steps.push({
                 queen: [...queen], N, row, col, status: "safe",
-                log: `Step ${steps.length + 1}: Place Queen for Row ${row + 1} at Column ${col + 1}. No horizontal, vertical, or diagonal threats!`
+                log: `Row ${row + 1}: Place queen at column ${col + 1}. Column and diagonal lines are clear.`
               });
             }
             solve(row + 1);
@@ -1315,7 +1405,7 @@ const ALGORITHMS = [
             if (steps.length < stepCap) {
               steps.push({
                 queen: [...queen], N, row, col, status: "backtrack",
-                log: `Step ${steps.length + 1} (Backtrack): Can't place next queen peacefully. Pick up Queen from Row ${row + 1}, Column ${col + 1} and try next column.`
+                log: `Backtracking from row ${row + 1}, column ${col + 1}. Remove queen and test next column.`
               });
             }
           }
@@ -1328,9 +1418,9 @@ const ALGORITHMS = [
     renderStep(stage, step) {
       const N = step.N;
       const queen = step.queen;
-      const cellSize = Math.min(38, Math.floor(280 / N));
+      const cellSize = Math.min(42, Math.floor(290 / N));
       let html = `
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
           <div class="chessboard" style="grid-template-columns: repeat(${N}, ${cellSize}px); grid-template-rows: repeat(${N}, ${cellSize}px);">
       `;
       for (let r = 0; r < N; r++) {
@@ -1344,8 +1434,8 @@ const ALGORITHMS = [
       }
       html += `
           </div>
-          <div style="font-size: 11.5px; font-weight: bold; color: #000080;">
-            Queens safely placed: ${queen.filter(x => x !== -1).length} of ${N}
+          <div style="font-size: 13px; font-weight: 700; color: var(--color-primary);">
+            Queens placed: ${queen.filter(x => x !== -1).length} of ${N}
           </div>
         </div>
       `;
@@ -1354,7 +1444,7 @@ const ALGORITHMS = [
   }
 ];
 
-// App Controller with Auto-Play & Friendly UX
+// App Controller
 class App {
   constructor() {
     this.currentAlgo = ALGORITHMS[0];
@@ -1365,68 +1455,92 @@ class App {
     this.playTimer = null;
 
     this.dom = {
-      algoShelf: document.getElementById('algo-shelf'),
-      conceptText: document.getElementById('concept-text'),
-      controlsBox: document.getElementById('controls-box'),
-      slider: document.getElementById('step-slider'),
-      stepCount: document.getElementById('step-count'),
-      logBox: document.getElementById('log-box'),
-      stage: document.getElementById('canvas-stage'),
-      btnFirst: document.getElementById('btn-first'),
-      btnPrev: document.getElementById('btn-prev'),
-      btnPlay: document.getElementById('btn-play'),
+      sidebarCategories: document.getElementById('sidebar-categories'),
+      searchBox: document.getElementById('search-box'),
+      breadcrumbText: document.getElementById('breadcrumb-text'),
+      algoTitle: document.getElementById('algo-title'),
+      categoryPill: document.getElementById('algo-category-pill'),
+      complexityPill: document.getElementById('algo-complexity-pill'),
+      theoryCallout: document.getElementById('theory-callout'),
+      theoryDesc: document.getElementById('theory-desc'),
+      theorySteps: document.getElementById('theory-steps'),
+      valBest: document.getElementById('val-best'),
+      valAvg: document.getElementById('val-avg'),
+      valWorst: document.getElementById('val-worst'),
+      valSpace: document.getElementById('val-space'),
+      algoControls: document.getElementById('algo-controls'),
+      timelineSlider: document.getElementById('timeline-slider'),
+      stepBadge: document.getElementById('step-badge'),
+      stepLogText: document.getElementById('step-log-text'),
+      stageCanvas: document.getElementById('stage-canvas'),
+      btnRestart: document.getElementById('btn-restart'),
+      btnBack: document.getElementById('btn-back'),
+      btnPlayPause: document.getElementById('btn-play-pause'),
       btnNext: document.getElementById('btn-next'),
-      btnLast: document.getElementById('btn-last'),
-      btnCode: document.getElementById('btn-view-code'),
-      codeModal: document.getElementById('code-modal'),
-      codeContent: document.getElementById('code-content'),
-      modalTitle: document.getElementById('modal-title'),
-      modalClose: document.getElementById('modal-close'),
-      statAlgo: document.getElementById('stat-algo'),
-      statTime: document.getElementById('stat-time'),
-      statSpace: document.getElementById('stat-space'),
-      metricBest: document.getElementById('metric-best'),
-      metricAvg: document.getElementById('metric-avg'),
-      metricWorst: document.getElementById('metric-worst'),
-      metricSpace: document.getElementById('metric-space'),
-      btnGhLink: document.getElementById('btn-gh-link')
+      btnJumpEnd: document.getElementById('btn-jump-end'),
+      btnCopyCode: document.getElementById('btn-copy-code'),
+      codeFileLabel: document.getElementById('code-file-label'),
+      codeTabName: document.getElementById('code-tab-name'),
+      sourceCodeDisplay: document.getElementById('source-code-display')
     };
 
     this.init();
   }
 
   init() {
-    this.renderShelf();
+    this.renderSidebar();
     this.bindEvents();
     this.loadAlgo(ALGORITHMS[0].id);
   }
 
-  renderShelf() {
-    this.dom.algoShelf.innerHTML = ALGORITHMS.map(a => `
-      <button class="win-btn algo-tab-btn ${a.id === this.currentAlgo.id ? 'active' : ''}" data-id="${a.id}">
-        <span class="badge">${a.assignment}</span> ${a.name}
-      </button>
-    `).join('');
+  renderSidebar(filterQuery = "") {
+    const q = filterQuery.toLowerCase().trim();
+    let html = "";
 
-    this.dom.algoShelf.querySelectorAll('.algo-tab-btn').forEach(btn => {
-      btn.onclick = () => this.loadAlgo(btn.dataset.id);
+    CATEGORIES.forEach(cat => {
+      const filteredItems = cat.items
+        .map(id => ALGORITHMS.find(a => a.id === id))
+        .filter(a => a && (a.name.toLowerCase().includes(q) || cat.name.toLowerCase().includes(q)));
+
+      if (filteredItems.length > 0) {
+        html += `
+          <div class="sidebar-section-title">${cat.name}</div>
+          <ul class="sidebar-menu">
+            ${filteredItems.map(a => `
+              <li class="sidebar-item ${a.id === this.currentAlgo.id ? 'active' : ''}" data-id="${a.id}">
+                <span>${a.name}</span>
+                <span class="sidebar-item-badge">${a.complexity.avg}</span>
+              </li>
+            `).join('')}
+          </ul>
+        `;
+      }
+    });
+
+    this.dom.sidebarCategories.innerHTML = html;
+    this.dom.sidebarCategories.querySelectorAll('.sidebar-item').forEach(item => {
+      item.onclick = () => this.loadAlgo(item.dataset.id);
     });
   }
 
   bindEvents() {
-    this.dom.slider.oninput = (e) => {
+    this.dom.searchBox.oninput = (e) => {
+      this.renderSidebar(e.target.value);
+    };
+
+    this.dom.timelineSlider.oninput = (e) => {
       this.pause();
       this.currentStepIdx = parseInt(e.target.value) || 0;
       this.updateStepView();
     };
 
-    this.dom.btnFirst.onclick = () => {
+    this.dom.btnRestart.onclick = () => {
       this.pause();
       this.currentStepIdx = 0;
       this.updateStepView();
     };
 
-    this.dom.btnPrev.onclick = () => {
+    this.dom.btnBack.onclick = () => {
       this.pause();
       if (this.currentStepIdx > 0) {
         this.currentStepIdx--;
@@ -1442,27 +1556,22 @@ class App {
       }
     };
 
-    this.dom.btnLast.onclick = () => {
+    this.dom.btnJumpEnd.onclick = () => {
       this.pause();
       this.currentStepIdx = this.steps.length - 1;
       this.updateStepView();
     };
 
-    if (this.dom.btnPlay) {
-      this.dom.btnPlay.onclick = () => this.togglePlay();
-    }
+    this.dom.btnPlayPause.onclick = () => this.togglePlay();
 
-    this.dom.btnCode.onclick = () => this.openCodeModal();
-    this.dom.modalClose.onclick = () => this.closeCodeModal();
-    this.dom.codeModal.onclick = (e) => {
-      if (e.target === this.dom.codeModal) this.closeCodeModal();
+    this.dom.btnCopyCode.onclick = () => {
+      const code = this.dom.sourceCodeDisplay.textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = this.dom.btnCopyCode.innerHTML;
+        this.dom.btnCopyCode.innerHTML = "<span>✅ Copied!</span>";
+        setTimeout(() => this.dom.btnCopyCode.innerHTML = orig, 1800);
+      });
     };
-
-    if (this.dom.btnGhLink) {
-      this.dom.btnGhLink.onclick = () => {
-        window.open(this.currentAlgo.githubUrl, '_blank');
-      };
-    }
   }
 
   togglePlay() {
@@ -1478,10 +1587,9 @@ class App {
       this.currentStepIdx = 0;
     }
     this.isPlaying = true;
-    if (this.dom.btnPlay) {
-      this.dom.btnPlay.textContent = '⏸ Pause';
-      this.dom.btnPlay.classList.add('playing');
-    }
+    this.dom.btnPlayPause.textContent = '⏸ Pause';
+    this.dom.btnPlayPause.classList.add('playing');
+
     this.playTimer = setInterval(() => {
       if (this.currentStepIdx < this.steps.length - 1) {
         this.currentStepIdx++;
@@ -1489,7 +1597,7 @@ class App {
       } else {
         this.pause();
       }
-    }, 800);
+    }, 850);
   }
 
   pause() {
@@ -1498,32 +1606,44 @@ class App {
       clearInterval(this.playTimer);
       this.playTimer = null;
     }
-    if (this.dom.btnPlay) {
-      this.dom.btnPlay.textContent = '▶ Play';
-      this.dom.btnPlay.classList.remove('playing');
-    }
+    this.dom.btnPlayPause.textContent = '▶ Play';
+    this.dom.btnPlayPause.classList.remove('playing');
   }
 
   loadAlgo(id) {
     this.pause();
     this.currentAlgo = ALGORITHMS.find(a => a.id === id) || ALGORITHMS[0];
     this.params = { ...this.currentAlgo.defaultParams };
-    this.renderShelf();
+    this.renderSidebar(this.dom.searchBox.value);
 
-    this.dom.conceptText.textContent = this.currentAlgo.concept;
-    this.dom.statAlgo.textContent = `${this.currentAlgo.name} (${this.currentAlgo.assignment})`;
-    this.dom.statTime.textContent = `Time: ${this.currentAlgo.complexity.avg}`;
-    this.dom.statSpace.textContent = `Space: ${this.currentAlgo.complexity.space}`;
+    // Header
+    this.dom.breadcrumbText.textContent = `Algorithms > ${this.currentAlgo.category} > ${this.currentAlgo.name}`;
+    this.dom.algoTitle.textContent = this.currentAlgo.name;
+    this.dom.categoryPill.textContent = this.currentAlgo.category;
+    this.dom.complexityPill.textContent = this.currentAlgo.complexity.avg;
 
-    this.dom.metricBest.textContent = this.currentAlgo.complexity.best;
-    this.dom.metricAvg.textContent = this.currentAlgo.complexity.avg;
-    this.dom.metricWorst.textContent = this.currentAlgo.complexity.worst;
-    this.dom.metricSpace.textContent = this.currentAlgo.complexity.space;
+    // Overview & Theory
+    this.dom.theoryCallout.innerHTML = `<b>Core Principle:</b> ${this.currentAlgo.concept}`;
+    this.dom.theoryDesc.textContent = this.currentAlgo.description;
+    this.dom.theorySteps.innerHTML = this.currentAlgo.steps.map(s => `<li>${s}</li>`).join('');
 
-    this.currentAlgo.renderControls(this.dom.controlsBox, this.params, (newParams) => {
+    this.dom.valBest.textContent = this.currentAlgo.complexity.best;
+    this.dom.valAvg.textContent = this.currentAlgo.complexity.avg;
+    this.dom.valWorst.textContent = this.currentAlgo.complexity.worst;
+    this.dom.valSpace.textContent = this.currentAlgo.complexity.space;
+
+    // Controls
+    this.currentAlgo.renderControls(this.dom.algoControls, this.params, (newParams) => {
       this.params = newParams;
       this.recompute();
     });
+
+    // Code
+    const path = this.currentAlgo.githubFile;
+    const rawCode = REPO_CODES[path] || "// Source code not found.";
+    this.dom.codeFileLabel.textContent = `File: ${path} (from viraj-des/DAA-Lab-TY)`;
+    this.dom.codeTabName.textContent = path.split('/').pop();
+    this.dom.sourceCodeDisplay.textContent = rawCode;
 
     this.recompute();
   }
@@ -1531,34 +1651,22 @@ class App {
   recompute() {
     this.pause();
     this.steps = this.currentAlgo.computeSteps(this.params);
-    this.dom.slider.max = Math.max(0, this.steps.length - 1);
+    this.dom.timelineSlider.max = Math.max(0, this.steps.length - 1);
     this.currentStepIdx = 0;
     this.updateStepView();
   }
 
   updateStepView() {
-    const step = this.steps[this.currentStepIdx] || { log: "No steps to show" };
-    this.dom.slider.value = this.currentStepIdx;
-    this.dom.stepCount.textContent = `Step ${this.currentStepIdx + 1} of ${this.steps.length}`;
-    this.dom.logBox.textContent = step.log || "";
+    const step = this.steps[this.currentStepIdx] || { log: "No steps to display." };
+    this.dom.timelineSlider.value = this.currentStepIdx;
+    this.dom.stepBadge.textContent = `Step ${this.currentStepIdx + 1} of ${this.steps.length}`;
+    this.dom.stepLogText.textContent = step.log || "";
 
-    this.currentAlgo.renderStep(this.dom.stage, step, this.params);
-  }
-
-  openCodeModal() {
-    const path = this.currentAlgo.githubFile;
-    const code = REPO_CODES[path] || "// Source code not found.";
-    this.dom.modalTitle.textContent = `Notepad - [${path}]`;
-    this.dom.codeContent.textContent = code;
-    this.dom.codeModal.classList.add('open');
-  }
-
-  closeCodeModal() {
-    this.dom.codeModal.classList.remove('open');
+    this.currentAlgo.renderStep(this.dom.stageCanvas, step, this.params);
   }
 }
 
-// Initialize when DOM is ready
+// Boot on DOM Ready
 window.addEventListener('DOMContentLoaded', () => {
   window.app = new App();
 });
@@ -1568,4 +1676,4 @@ final_js = template.replace('__REPO_CODES__', json.dumps(codes, indent=2))
 with open('app.js', 'w') as f:
     f.write(final_js)
 
-print("Wrote updated app.js successfully, size:", len(final_js), "bytes")
+print("Generated clean modern app.js, size:", len(final_js), "bytes")
