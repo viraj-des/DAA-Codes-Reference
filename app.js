@@ -1504,49 +1504,11 @@ class App {
   }
 
   init() {
-    this.initStatCounter();
     this.renderHomeGrid();
     this.renderSidebar();
     this.bindEvents();
     this.initAsciiHero();
     this.showHome();
-  }
-
-  initStatCounter() {
-    let visits = parseInt(localStorage.getItem('daa_visits_count') || '0', 10);
-    if (!sessionStorage.getItem('daa_session_visited')) {
-      visits += 1;
-      sessionStorage.setItem('daa_session_visited', 'true');
-      localStorage.setItem('daa_visits_count', visits.toString());
-    }
-    const totalVisits = 1428 + visits;
-    this.animateCounter(this.dom.statVisits, totalVisits);
-    if (this.dom.sidebarVisitCount) {
-      this.dom.sidebarVisitCount.textContent = totalVisits.toLocaleString();
-    }
-  }
-
-  animateCounter(element, target) {
-    if (!element) return;
-    const duration = 1200;
-    const start = Math.max(0, target - 50);
-    const startTime = performance.now();
-
-    const update = (now) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // easeOutCubic
-      const ease = 1 - Math.pow(1 - progress, 3);
-      const current = Math.floor(start + (target - start) * ease);
-      element.textContent = current.toLocaleString();
-
-      if (progress < 1) {
-        requestAnimationFrame(update);
-      } else {
-        element.textContent = target.toLocaleString();
-      }
-    };
-    requestAnimationFrame(update);
   }
 
   renderHomeGrid() {
