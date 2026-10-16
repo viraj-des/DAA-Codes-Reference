@@ -1,26 +1,12 @@
 # DAA & DSA Interactive Handbook
 
-A modern, Apple-inspired interactive learning platform for Design and Analysis of Algorithms (DAA) and Data Structures (DSA), connected to [viraj-des/DAA-Lab-TY](https://github.com/viraj-des/DAA-Lab-TY).
+Hi everyone, I'm Viraj - the creator of this little repo.
+I've published this as an interactive website thanks to the recommendation by my Professor - Pranalini Joshi, under her course - Design and Analysis of Algorithms - taught in the 5th Semester of my B.Tech degree in Computer Science and Engineering.
 
-## Highlights
+I hope you enjoy this and find the implementations useful. I will try to keep handing off the repo via PR's to my juniors as I move to my other courses and relevant course-work, I'm sure they will add relevant and interesting updates to this little project.
 
-- **Apple / GeeksforGeeks Clean UI**: Modern San Francisco typography, subtle borders, high-contrast readability, zero clutter.
-- **Categorized Left Sidebar**: Instant switching and live search across all algorithms:
-  - **Divide & Conquer**: Binary Search, Merge Sort, Quick Sort
-  - **Greedy Algorithms**: Job Sequencing with Deadlines, Prim's Minimum Spanning Tree, Dijkstra's Shortest Path
-  - **Dynamic Programming**: Floyd-Warshall Algorithm
-  - **Backtracking**: Sudoku Solver, N-Queens Problem
-- **Educational Flow for Students**:
-  1. **Title & Categorization**: Clean concepts without confusing "Lab/Assignment" labels.
-  2. **Overview & Theory**: Plain English explanation, step-by-step logic, and complexity cards (Best, Average, Worst, Space).
-  3. **Interactive Visualization**: Quick presets, live parameter tweaking, VCR controls (Play/Pause, Back, Next, Slider), and step-by-step commentary.
-  4. **Implementation Code**: Xcode-style dark code block with copy button and direct links to GitHub source.
+I hope this becomes a useful, and go to place for students taking up similar courses all over Pune to refer to and learn intuitively, visually and interactively from....
 
-## Quick Start
+If you want to suggest any changes, please open an **Issue** on Github, and then implement your suggesstion via a **Pull Request** in this repository : [https://github.com/viraj-des/DAA-Lab-TY](https://github.com/viraj-des/DAA-Lab-TY)
 
-Open `index.html` directly in any web browser, or serve locally:
-
-```bash
-python3 -m http.server 8080
-```
-Then visit `http://localhost:8080`.
+- Best, Viraj Shah

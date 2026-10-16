@@ -1458,8 +1458,19 @@ class App {
     this.currentStepIdx = 0;
     this.isPlaying = false;
     this.playTimer = null;
+    this.currentView = 'home';
+    this.asciiAnimId = null;
 
     this.dom = {
+      viewHome: document.getElementById('view-home'),
+      viewAlgorithm: document.getElementById('view-algorithm'),
+      sidebarHomeBtn: document.getElementById('sidebar-home-btn'),
+      navHomeBtn: document.getElementById('nav-home-btn'),
+      brandHomeLink: document.getElementById('brand-home-link'),
+      homeAlgoGrid: document.getElementById('home-algo-grid'),
+      statVisits: document.getElementById('stat-visits'),
+      sidebarVisitCount: document.getElementById('sidebar-visit-count'),
+      asciiCanvas: document.getElementById('ascii-canvas'),
       sidebarCategories: document.getElementById('sidebar-categories'),
       searchBox: document.getElementById('search-box'),
       breadcrumbText: document.getElementById('breadcrumb-text'),
@@ -1493,9 +1504,201 @@ class App {
   }
 
   init() {
+    this.initStatCounter();
+    this.renderHomeGrid();
     this.renderSidebar();
     this.bindEvents();
-    this.loadAlgo(ALGORITHMS[0].id);
+    this.initAsciiHero();
+    this.showHome();
+  }
+
+  initStatCounter() {
+    let visits = parseInt(localStorage.getItem('daa_visits_count') || '0', 10);
+    if (!sessionStorage.getItem('daa_session_visited')) {
+      visits += 1;
+      sessionStorage.setItem('daa_session_visited', 'true');
+      localStorage.setItem('daa_visits_count', visits.toString());
+    }
+    const totalVisits = 1428 + visits;
+    this.animateCounter(this.dom.statVisits, totalVisits);
+    if (this.dom.sidebarVisitCount) {
+      this.dom.sidebarVisitCount.textContent = totalVisits.toLocaleString();
+    }
+  }
+
+  animateCounter(element, target) {
+    if (!element) return;
+    const duration = 1200;
+    const start = Math.max(0, target - 50);
+    const startTime = performance.now();
+
+    const update = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutCubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(start + (target - start) * ease);
+      element.textContent = current.toLocaleString();
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        element.textContent = target.toLocaleString();
+      }
+    };
+    requestAnimationFrame(update);
+  }
+
+  renderHomeGrid() {
+    if (!this.dom.homeAlgoGrid) return;
+    this.dom.homeAlgoGrid.innerHTML = ALGORITHMS.map(a => `
+      <div class="home-algo-card" data-id="${a.id}">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <span class="home-algo-title">${a.name}</span>
+            <span class="tag-pill" style="font-size: 10px; padding: 2px 7px;">${a.category}</span>
+          </div>
+          <p class="home-algo-desc">${a.concept}</p>
+        </div>
+        <div class="home-algo-footer">
+          <span style="font-family: var(--font-mono); font-weight: 700; color: var(--color-primary);">${a.complexity.avg}</span>
+          <span style="font-weight: 600; color: var(--color-primary); font-size: 12px;">Open Walkthrough →</span>
+        </div>
+      </div>
+    `).join('');
+
+    this.dom.homeAlgoGrid.querySelectorAll('.home-algo-card').forEach(card => {
+      card.onclick = () => this.loadAlgo(card.dataset.id);
+    });
+  }
+
+  initAsciiHero() {
+    const canvas = this.dom.asciiCanvas;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const chars = " .'`\":;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+    let mouseX = -999;
+    let mouseY = -999;
+    let mouseActive = false;
+    let width = 0;
+    let height = 0;
+    const charW = 10;
+    const charH = 14;
+    let cols = 0;
+    let rows = 0;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width;
+      height = 200;
+      canvas.width = width;
+      canvas.height = height;
+      cols = Math.floor(width / charW);
+      rows = Math.floor(height / charH);
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseX = e.clientX - rect.left;
+      mouseY = e.clientY - rect.top;
+      mouseActive = true;
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      mouseActive = false;
+      mouseX = -999;
+      mouseY = -999;
+    });
+
+    let startTime = performance.now();
+
+    const renderAscii = (now) => {
+      if (this.currentView !== 'home') {
+        this.asciiAnimId = null;
+        return;
+      }
+
+      const t = (now - startTime) * 0.002;
+      ctx.fillStyle = '#111115';
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.font = '10px ui-monospace, "SF Mono", Menlo, monospace';
+      ctx.textBaseline = 'top';
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = c * charW;
+          const y = r * charH;
+
+          // Ambient wave formula
+          const wave1 = Math.sin(c * 0.09 + t * 1.5) * Math.cos(r * 0.14 - t * 0.9);
+          const wave2 = Math.sin((c + r) * 0.07 + t);
+          let intensity = (wave1 + wave2 + 2) / 4; // 0 to 1
+
+          // Cursor ripple deformation
+          if (mouseActive) {
+            const dx = x - mouseX;
+            const dy = y - mouseY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 180) {
+              const ripple = Math.sin(dist * 0.08 - t * 6) * Math.exp(-dist * 0.02);
+              intensity = Math.max(0, Math.min(1, intensity + ripple * 0.8));
+            }
+          }
+
+          const charIdx = Math.floor(intensity * (chars.length - 1));
+          const char = chars[Math.max(0, Math.min(chars.length - 1, charIdx))];
+
+          // Subtly colorize active ripples and matrix
+          if (intensity > 0.75) {
+            ctx.fillStyle = '#34c759'; // vibrant terminal green on peaks
+          } else if (intensity > 0.5) {
+            ctx.fillStyle = '#5ac8fa'; // cyan highlights
+          } else if (intensity > 0.25) {
+            ctx.fillStyle = '#8e8e93'; // soft gray
+          } else {
+            ctx.fillStyle = '#3a3a3c'; // faint background glyphs
+          }
+
+          ctx.fillText(char, x, y);
+        }
+      }
+
+      this.asciiAnimId = requestAnimationFrame(renderAscii);
+    };
+
+    this.startAsciiLoop = () => {
+      if (!this.asciiAnimId) {
+        resize();
+        this.asciiAnimId = requestAnimationFrame(renderAscii);
+      }
+    };
+
+    this.startAsciiLoop();
+  }
+
+  showHome() {
+    this.pause();
+    this.currentView = 'home';
+    if (this.dom.viewHome) this.dom.viewHome.style.display = 'block';
+    if (this.dom.viewAlgorithm) this.dom.viewAlgorithm.style.display = 'none';
+    if (this.dom.sidebarHomeBtn) this.dom.sidebarHomeBtn.classList.add('active');
+
+    // Deselect algorithm items in sidebar
+    if (this.dom.sidebarCategories) {
+      this.dom.sidebarCategories.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+    }
+
+    if (this.startAsciiLoop) {
+      this.startAsciiLoop();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   renderSidebar(filterQuery = "") {
@@ -1512,7 +1715,7 @@ class App {
           <div class="sidebar-section-title">${cat.name}</div>
           <ul class="sidebar-menu">
             ${filteredItems.map(a => `
-              <li class="sidebar-item ${a.id === this.currentAlgo.id ? 'active' : ''}" data-id="${a.id}">
+              <li class="sidebar-item ${this.currentView === 'algo' && a.id === this.currentAlgo?.id ? 'active' : ''}" data-id="${a.id}">
                 <span>${a.name}</span>
                 <span class="sidebar-item-badge">${a.complexity.avg}</span>
               </li>
@@ -1529,6 +1732,22 @@ class App {
   }
 
   bindEvents() {
+    if (this.dom.sidebarHomeBtn) {
+      this.dom.sidebarHomeBtn.onclick = () => this.showHome();
+    }
+    if (this.dom.navHomeBtn) {
+      this.dom.navHomeBtn.onclick = (e) => {
+        e.preventDefault();
+        this.showHome();
+      };
+    }
+    if (this.dom.brandHomeLink) {
+      this.dom.brandHomeLink.onclick = (e) => {
+        e.preventDefault();
+        this.showHome();
+      };
+    }
+
     this.dom.searchBox.oninput = (e) => {
       this.renderSidebar(e.target.value);
     };
@@ -1617,6 +1836,11 @@ class App {
 
   loadAlgo(id) {
     this.pause();
+    this.currentView = 'algo';
+    if (this.dom.viewHome) this.dom.viewHome.style.display = 'none';
+    if (this.dom.viewAlgorithm) this.dom.viewAlgorithm.style.display = 'block';
+    if (this.dom.sidebarHomeBtn) this.dom.sidebarHomeBtn.classList.remove('active');
+
     this.currentAlgo = ALGORITHMS.find(a => a.id === id) || ALGORITHMS[0];
     this.params = { ...this.currentAlgo.defaultParams };
     this.renderSidebar(this.dom.searchBox.value);
@@ -1651,6 +1875,7 @@ class App {
     this.dom.sourceCodeDisplay.textContent = rawCode;
 
     this.recompute();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   recompute() {
