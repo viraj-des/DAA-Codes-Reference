@@ -7,6 +7,6 @@ I hope you enjoy this and find the implementations useful. I will try to keep ha
 
 I hope this becomes a useful, and go to place for students taking up similar courses all over Pune to refer to and learn intuitively, visually and interactively from....
 
-If you want to suggest any changes, please open an **Issue** on Github, and then implement your suggesstion via a **Pull Request** in this repository : [https://github.com/viraj-des/DAA-Lab-TY](https://github.com/viraj-des/DAA-Lab-TY)
+If you want to suggest any changes, please open an **Issue** on Github, and then implement your suggesstion via a **Pull Request** in this repository : [https://github.com/viraj-des/DAA-Codes-Reference](https://github.com/viraj-des/DAA-Codes-Reference)
 
 - Best, Viraj Shah
