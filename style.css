@@ -1,0 +1,962 @@
+/* Windows 98 Authentic Theme System for DAA Lab */
+:root {
+  --win-gray: #c0c0c0;
+  --win-dark-gray: #808080;
+  --win-light: #ffffff;
+  --win-shadow: #000000;
+  --win-border-light: #dfdfdf;
+  --win-blue-start: #000080;
+  --win-blue-end: #1084d0;
+  --win-text: #000000;
+  --win-teal: #008080;
+  --win-yellow-tip: #ffffc0;
+  --win-navy: #000080;
+  --win-highlight: #000080;
+  --win-highlight-text: #ffffff;
+  --font-system: "MS Sans Serif", "Tahoma", "Segoe UI", -apple-system, sans-serif;
+  --font-mono: "Lucida Console", "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--win-teal);
+  font-family: var(--font-system);
+  font-size: 11px;
+  color: var(--win-text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 3D Bevel Utilities */
+.outset-box {
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-shadow);
+  border-bottom: 2px solid var(--win-shadow);
+  background-color: var(--win-gray);
+}
+
+.inset-box {
+  border-top: 2px solid var(--win-dark-gray);
+  border-left: 2px solid var(--win-dark-gray);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  background-color: #ffffff;
+}
+
+.inset-deep {
+  border-top: 2px solid var(--win-shadow);
+  border-left: 2px solid var(--win-shadow);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  background-color: #ffffff;
+}
+
+/* Buttons */
+.win-btn {
+  background: var(--win-gray);
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-shadow);
+  border-bottom: 2px solid var(--win-shadow);
+  font-family: var(--font-system);
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 9px;
+  cursor: pointer;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.win-btn:active, .win-btn.active {
+  border-top: 2px solid var(--win-shadow);
+  border-left: 2px solid var(--win-shadow);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 5px 8px 3px 10px;
+  background-color: #b0b0b0;
+}
+
+.win-btn:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -4px;
+}
+
+.win-btn.small {
+  padding: 2px 6px;
+  font-size: 10.5px;
+}
+
+.win-btn.play-btn {
+  background: #d4ffd4;
+  color: #005500;
+}
+
+.win-btn.play-btn.playing {
+  background: #ffe0d0;
+  color: #880000;
+}
+
+.win-btn.active-tab {
+  background: #ffffff;
+  border-top: 2px solid var(--win-shadow);
+  border-left: 2px solid var(--win-shadow);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  font-weight: bold;
+}
+
+/* Preset Chips */
+.preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.preset-chip {
+  background: #f0f0f0;
+  border: 1px solid #777;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-family: var(--font-system);
+  cursor: pointer;
+  border-radius: 1px;
+}
+
+.preset-chip:hover {
+  background: #ffffa0;
+  border-color: #000;
+}
+
+.clickable-num-pill {
+  background: #e0e8ff;
+  border: 1px solid #000080;
+  color: #000080;
+  padding: 2px 5px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.clickable-num-pill:hover {
+  background: #000080;
+  color: #fff;
+}
+
+/* Main Window Container */
+.app-window {
+  width: 100%;
+  max-width: 1200px;
+  min-height: calc(100vh - 16px);
+  display: flex;
+  flex-direction: column;
+  background: var(--win-gray);
+  box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* Titlebar */
+.title-bar {
+  background: linear-gradient(90deg, var(--win-blue-start) 0%, var(--win-blue-end) 100%);
+  color: #ffffff;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+}
+
+.title-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.title-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.title-controls {
+  display: flex;
+  gap: 2px;
+}
+
+.win-ctl-btn {
+  width: 16px;
+  height: 14px;
+  padding: 0;
+  font-family: var(--font-system);
+  font-size: 9px;
+  line-height: 11px;
+  background: var(--win-gray);
+  border-top: 1px solid var(--win-light);
+  border-left: 1px solid var(--win-light);
+  border-right: 1px solid var(--win-shadow);
+  border-bottom: 1px solid var(--win-shadow);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.win-ctl-btn:active {
+  border-top: 1px solid var(--win-shadow);
+  border-left: 1px solid var(--win-shadow);
+  border-right: 1px solid var(--win-light);
+  border-bottom: 1px solid var(--win-light);
+}
+
+/* Menu Bar */
+.menu-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 3px 6px;
+  background: var(--win-gray);
+  border-bottom: 1px solid var(--win-dark-gray);
+  font-size: 11px;
+}
+
+.menu-item {
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.menu-item:hover {
+  background: var(--win-highlight);
+  color: var(--win-highlight-text);
+}
+
+.menu-item a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Algorithm Navigation Tabs / Shelf */
+.algo-shelf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 5px 6px 4px 6px;
+  background: #d4d0c8;
+  border-bottom: 2px solid var(--win-dark-gray);
+}
+
+.algo-tab-btn {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 0;
+}
+
+.algo-tab-btn .badge {
+  background: #333;
+  color: #fff;
+  font-size: 9px;
+  padding: 0 3px;
+  margin-right: 3px;
+  font-weight: normal;
+}
+
+.algo-tab-btn.active {
+  background: #ffffff;
+  border-bottom-color: #ffffff;
+  color: #000;
+  font-weight: bold;
+}
+
+/* Main Window Content Layout */
+.app-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  background: var(--win-gray);
+  overflow: auto;
+}
+
+/* 1-Line Explanation Box (Enlarged & High-Impact) */
+.concept-banner {
+  background: #ffffcc;
+  border: 2px solid #000000;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.25);
+  margin-bottom: 4px;
+}
+
+.concept-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.concept-label {
+  background: #000080;
+  color: #fff;
+  font-weight: bold;
+  padding: 3px 6px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+#concept-text {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #000000;
+  line-height: 1.4;
+}
+
+.concept-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Workspace Two-Column Grid */
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 8px;
+  flex: 1;
+}
+
+@media (max-width: 950px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Fieldsets (Classic Win98 Groupboxes) */
+fieldset.win-group {
+  border: 2px groove var(--win-light);
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: var(--win-gray);
+}
+
+legend.win-legend {
+  padding: 0 4px;
+  font-weight: bold;
+  font-size: 11.5px;
+  color: var(--win-navy);
+}
+
+/* Form inputs & controls */
+.control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.control-row label {
+  font-size: 11px;
+  color: #000;
+}
+
+.win-input, .win-select {
+  font-family: var(--font-system);
+  font-size: 11px;
+  padding: 3px 5px;
+  border-top: 2px solid var(--win-dark-gray);
+  border-left: 2px solid var(--win-dark-gray);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  background: #ffffff;
+  color: #000000;
+  outline: none;
+}
+
+.win-input:focus, .win-select:focus {
+  outline: 1px dotted #000;
+}
+
+/* Stepper & Playback Bar */
+.scrubber-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--win-gray);
+}
+
+.scrubber-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.step-counter {
+  font-weight: bold;
+  font-size: 11.5px;
+  padding: 3px 8px;
+  min-width: 90px;
+  text-align: center;
+  background: #ffffff;
+  border-top: 1px solid var(--win-dark-gray);
+  border-left: 1px solid var(--win-dark-gray);
+  border-right: 1px solid var(--win-light);
+  border-bottom: 1px solid var(--win-light);
+}
+
+.win-slider {
+  width: 100%;
+  accent-color: var(--win-navy);
+  cursor: pointer;
+  height: 20px;
+}
+
+.log-box {
+  background: #ffffff;
+  border-top: 2px solid var(--win-dark-gray);
+  border-left: 2px solid var(--win-dark-gray);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 7px 9px;
+  font-family: var(--font-system);
+  font-size: 12px;
+  min-height: 52px;
+  max-height: 75px;
+  overflow-y: auto;
+  line-height: 1.45;
+  color: #000;
+  word-break: break-word;
+}
+
+/* Color Legend */
+.color-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px 8px;
+  background: #e8e8e8;
+  border-bottom: 1px solid #808080;
+  font-size: 10.5px;
+  margin-bottom: 6px;
+  width: 100%;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border: 1px solid #333;
+}
+
+/* Right Panel: Visualization Stage */
+.stage-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.canvas-container {
+  flex: 1;
+  min-height: 400px;
+  background: #ffffff;
+  border-top: 2px solid var(--win-dark-gray);
+  border-left: 2px solid var(--win-dark-gray);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  position: relative;
+  overflow: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Complexity and Metrics footer within workspace */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 4px;
+}
+
+.metric-cell {
+  background: var(--win-gray);
+  border-top: 1px solid var(--win-dark-gray);
+  border-left: 1px solid var(--win-dark-gray);
+  border-right: 1px solid var(--win-light);
+  border-bottom: 1px solid var(--win-light);
+  padding: 4px 6px;
+  font-size: 10.5px;
+}
+
+.metric-cell b {
+  color: var(--win-navy);
+}
+
+/* Windows 98 Status Bar */
+.status-bar {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 120px;
+  gap: 3px;
+  padding: 3px;
+  background: var(--win-gray);
+  border-top: 1px solid var(--win-dark-gray);
+  font-size: 11px;
+}
+
+.status-segment {
+  border-top: 1px solid var(--win-dark-gray);
+  border-left: 1px solid var(--win-dark-gray);
+  border-right: 1px solid var(--win-light);
+  border-bottom: 1px solid var(--win-light);
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Code Viewer Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 15px;
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-window {
+  width: 760px;
+  max-width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--win-gray);
+  box-shadow: 4px 4px 14px rgba(0,0,0,0.5);
+}
+
+.code-container {
+  flex: 1;
+  background: #ffffff;
+  border-top: 2px solid var(--win-dark-gray);
+  border-left: 2px solid var(--win-dark-gray);
+  border-right: 2px solid var(--win-light);
+  border-bottom: 2px solid var(--win-light);
+  padding: 8px;
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre;
+  color: #000;
+  user-select: text;
+}
+
+/* Specific Algorithm Visual Styles */
+/* Binary Search */
+.bs-tape {
+  display: flex;
+  gap: 5px;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 35px 10px 40px 10px;
+  flex-wrap: wrap;
+}
+
+.bs-cell-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: 48px;
+}
+
+.bs-cell {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: bold;
+  background: #e8e8e8;
+  border-top: 2px solid var(--win-light);
+  border-left: 2px solid var(--win-light);
+  border-right: 2px solid var(--win-shadow);
+  border-bottom: 2px solid var(--win-shadow);
+  transition: background 0.1s;
+}
+
+.bs-idx {
+  font-size: 10.5px;
+  color: #444;
+  margin-top: 4px;
+  font-weight: bold;
+}
+
+.bs-cell.dimmed {
+  opacity: 0.22;
+  background: #d8d8d8;
+}
+
+.bs-cell.active-range {
+  background: #ffffd0;
+  border-color: #aa9900;
+}
+
+.bs-cell.mid-cell {
+  background: #ffd080;
+  border-color: #ff8800;
+}
+
+.bs-cell.found {
+  background: #80e880;
+  border-color: #008800;
+  animation: pulse 0.5s ease-in-out infinite alternate;
+}
+
+.bs-pointer {
+  position: absolute;
+  font-size: 9.5px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.bs-pointer.low {
+  top: -24px;
+  background: #000080;
+  color: #fff;
+}
+
+.bs-pointer.mid {
+  top: -38px;
+  background: #cc6600;
+  color: #fff;
+}
+
+.bs-pointer.high {
+  top: -24px;
+  background: #800000;
+  color: #fff;
+}
+
+/* Sorting Bar Visualizer (Merge / Quick) */
+.bars-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  height: 250px;
+  width: 100%;
+  max-width: 680px;
+  padding: 10px;
+  border-bottom: 2px solid #808080;
+  margin: 10px 0;
+}
+
+.sort-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 52px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.sort-bar {
+  width: 100%;
+  background: #000080;
+  border-top: 2px solid #8080ff;
+  border-left: 2px solid #8080ff;
+  border-right: 2px solid #000040;
+  border-bottom: 2px solid #000040;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: bold;
+  padding-bottom: 4px;
+}
+
+.sort-bar.pivot {
+  background: #cc0000;
+  border-color: #ff6666 #000 #000 #ff6666;
+}
+
+.sort-bar.comparing {
+  background: #e6a100;
+  border-color: #ffd24d #000 #000 #ffd24d;
+}
+
+.sort-bar.sorted {
+  background: #008000;
+  border-color: #66cc66 #000 #000 #66cc66;
+}
+
+.sort-bar.dimmed {
+  opacity: 0.25;
+}
+
+/* Job Sequencing Gantt Chart */
+.gantt-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 650px;
+}
+
+.gantt-slots-row {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+  background: #e8e8e8;
+  border: 2px inset var(--win-dark-gray);
+  justify-content: center;
+}
+
+.gantt-slot {
+  flex: 1;
+  min-width: 75px;
+  height: 75px;
+  background: #f4f4f4;
+  border: 2px dashed #999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-size: 11px;
+}
+
+.gantt-slot.filled {
+  background: #c8e0ff;
+  border: 2px solid #000080;
+}
+
+.gantt-slot-num {
+  font-size: 9.5px;
+  color: #666;
+  position: absolute;
+  top: 2px;
+  left: 4px;
+}
+
+.gantt-job-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #000080;
+}
+
+.gantt-job-profit {
+  font-size: 11px;
+  color: #008000;
+  font-weight: bold;
+}
+
+/* Sudoku Grid */
+.sudoku-board {
+  display: grid;
+  grid-template-columns: repeat(9, 36px);
+  grid-template-rows: repeat(9, 36px);
+  border: 3px solid #000000;
+  background: #000;
+  gap: 1px;
+}
+
+.sudoku-cell {
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: var(--font-mono);
+}
+
+.sudoku-cell.clue {
+  color: #000080;
+  background: #eef2ff;
+}
+
+.sudoku-cell.solved {
+  color: #008000;
+}
+
+.sudoku-cell.current-test {
+  background: #ffff80;
+  color: #cc0000;
+}
+
+.sudoku-cell.box-right {
+  border-right: 2px solid #000;
+}
+
+.sudoku-cell.box-bottom {
+  border-bottom: 2px solid #000;
+}
+
+/* Chessboard (N-Queens) */
+.chessboard {
+  display: grid;
+  border: 3px solid #000000;
+  box-shadow: 2px 2px 0px #888;
+}
+
+.chess-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  position: relative;
+}
+
+.chess-cell.light {
+  background: #ffeedd;
+}
+
+.chess-cell.dark {
+  background: #b88b4a;
+}
+
+.chess-cell.threatened {
+  background: #f7a8a8 !important;
+}
+
+.chess-cell.has-queen {
+  color: #000080;
+  text-shadow: 1px 1px 0 #fff;
+}
+
+/* Floyd-Warshall Matrix */
+.matrix-table {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin: 10px auto;
+}
+
+.matrix-table th, .matrix-table td {
+  border: 1px solid #808080;
+  padding: 6px 12px;
+  text-align: center;
+  min-width: 48px;
+}
+
+.matrix-table th {
+  background: #c0c0c0;
+  color: #000080;
+  font-weight: bold;
+}
+
+.matrix-table td.highlight-k {
+  background: #ffffc0;
+}
+
+.matrix-table td.updated-cell {
+  background: #b0ffb0;
+  font-weight: bold;
+}
+
+/* SVG Graph Display (Prim's & Dijkstra) */
+.graph-svg {
+  width: 100%;
+  max-width: 600px;
+  height: 340px;
+  background: #ffffff;
+}
+
+.graph-edge {
+  stroke: #808080;
+  stroke-width: 2;
+  transition: stroke 0.1s, stroke-width 0.1s;
+}
+
+.graph-edge.mst-edge, .graph-edge.path-edge {
+  stroke: #008000;
+  stroke-width: 4;
+}
+
+.graph-edge.candidate-edge {
+  stroke: #e6a100;
+  stroke-width: 3;
+  stroke-dasharray: 4;
+}
+
+.graph-node {
+  fill: #c0c0c0;
+  stroke: #000080;
+  stroke-width: 2;
+  cursor: default;
+}
+
+.graph-node.visited {
+  fill: #c8e0ff;
+}
+
+.graph-node.current {
+  fill: #ffff80;
+  stroke: #cc0000;
+  stroke-width: 3;
+}
+
+.graph-node-text {
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: bold;
+  fill: #000080;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.graph-edge-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: bold;
+  fill: #333;
+  text-anchor: middle;
+  dominant-baseline: central;
+  background: #fff;
+}
